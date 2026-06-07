@@ -144,7 +144,7 @@ export default function HomePage() {
           <div className="flex flex-col-reverse lg:flex-row items-center gap-8 lg:gap-12">
             <div className="flex-1 text-center lg:text-left">
               <div className="inline-block bg-[#FF9900] text-[#131921] text-xs font-bold px-3 py-1 rounded mb-4 uppercase tracking-wide">
-                Message From Chairman
+                Message From Director
               </div>
               <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#0F1111] mb-4">
                 Empowering India&#39;s Next Generation of Professionals

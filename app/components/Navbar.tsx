@@ -15,7 +15,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center mr-2 border border-transparent hover:border-white px-2 py-1 rounded">
             <div className="flex flex-col leading-none">
-              <span className="text-white font-bold text-xl tracking-tight">CareerBridge</span>
+              <span className="text-white font-bold text-xl tracking-tight">HireVexa</span>
               <span className="text-[#FF9900] text-[10px] font-semibold tracking-widest uppercase">Consultancy</span>
             </div>
           </Link>

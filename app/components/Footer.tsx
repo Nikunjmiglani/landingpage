@@ -18,7 +18,7 @@ export default function Footer() {
           <div>
             <h4 className="font-bold text-sm mb-3">Get to Know Us</h4>
             <ul className="space-y-2 text-[#DDDDDD] text-sm">
-              <li><Link href="#" className="hover:text-white hover:underline">About CareerBridge</Link></li>
+              <li><Link href="#" className="hover:text-white hover:underline">About HireVexa</Link></li>
               <li><Link href="#" className="hover:text-white hover:underline">Our Team</Link></li>
               <li><Link href="#" className="hover:text-white hover:underline">Success Stories</Link></li>
               <li><Link href="#" className="hover:text-white hover:underline">Press Releases</Link></li>
@@ -61,7 +61,7 @@ export default function Footer() {
       <div className="bg-[#131921] py-6">
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-white font-bold text-lg">CareerBridge</span>
+            <span className="text-white font-bold text-lg">HireVexa</span>
             <span className="text-[#FF9900] text-xs font-semibold tracking-widest uppercase">Consultancy</span>
           </div>
           <div className="flex flex-wrap justify-center gap-4 text-[#DDDDDD] text-xs">
@@ -70,7 +70,7 @@ export default function Footer() {
             <Link href="#" className="hover:text-white hover:underline">Cookie Notice</Link>
             <Link href="#" className="hover:text-white hover:underline">Interest-Based Ads</Link>
           </div>
-          <p className="text-[#AAAAAA] text-xs">© 2024 CareerBridge Consultancy. All rights reserved.</p>
+          <p className="text-[#AAAAAA] text-xs">© 2024 HireVexa Consultancy. All rights reserved.</p>
         </div>
       </div>
     </footer>
