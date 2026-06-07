@@ -17,9 +17,16 @@ const testimonials = [
 ];
 
 const companies = [
-  { name: "TCS" }, { name: "Infosys" }, { name: "Wipro" },
-  { name: "Accenture" }, { name: "Deloitte" }, { name: "HCL" },
-  { name: "IBM" }, { name: "Capgemini" }, { name: "Cognizant" }, { name: "Tech Mahindra" },
+  { name: "TCS", logo: "/logos/tcs.png" },
+  { name: "Infosys", logo: "/logos/infosys.png" },
+  { name: "Wipro", logo: "/logos/wipro.png" },
+  { name: "Accenture", logo: "/logos/accenture.png" },
+  { name: "Deloitte", logo: "/logos/deloitte.png" },
+  { name: "HCL", logo: "/logos/hcl.png" },
+  { name: "IBM", logo: "/logos/ibm.png" },
+  { name: "Capgemini", logo: "/logos/capgemini.png" },
+  { name: "Cognizant", logo: "/logos/cognizant.png" },
+  { name: "Tech Mahindra", logo: "/logos/techmahindra.png" },
 ];
 
 export default function HomePage() {
@@ -100,22 +107,38 @@ export default function HomePage() {
           ))}
         </div>
 
-        {/* Partner Companies - marquee */}
         <div className="bg-white border border-[#DDD] rounded p-4 sm:p-6 overflow-hidden">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-5">
-            <h2 className="text-lg sm:text-xl font-bold text-[#0F1111]">Our Hiring Partners</h2>
-            <div className="bg-[#232F3E] px-4 py-2 rounded text-sm font-semibold text-white">380+ Companies</div>
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-5">
+      <h2 className="text-lg sm:text-xl font-bold text-[#0F1111] text-center sm:text-left">
+        Our Hiring Partners
+      </h2>
+
+      <div className="bg-[#232F3E] px-4 py-2 rounded text-sm font-semibold text-white">
+        380+ Companies
+      </div>
+    </div>
+
+    <div className="relative overflow-hidden">
+      <div className="flex animate-marquee gap-4 sm:gap-8 w-max">
+        {[...companies, ...companies].map((company, index) => (
+          <div
+            key={index}
+            className="flex-shrink-0 bg-white border border-[#DDD] rounded-lg px-4 sm:px-6 py-4 min-w-[130px] sm:min-w-[180px] flex flex-col items-center justify-center hover:shadow-lg transition-all duration-300"
+          >
+            <img
+              src={company.logo}
+              alt={company.name}
+              className="h-8 sm:h-12 object-contain mb-2 sm:mb-3"
+            />
+
+            <p className="font-semibold text-[#232F3E] text-xs sm:text-sm text-center">
+              {company.name}
+            </p>
           </div>
-          <div className="relative overflow-hidden">
-            <div className="flex gap-4 sm:gap-6 w-max animate-[marquee_25s_linear_infinite]">
-              {[...companies, ...companies].map((company, i) => (
-                <div key={i} className="flex-shrink-0 bg-[#F0F2F2] border border-[#DDD] rounded-lg px-5 py-3 min-w-[120px] flex items-center justify-center hover:shadow-md transition-all">
-                  <p className="font-bold text-[#232F3E] text-sm text-center">{company.name}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        ))}
+      </div>
+    </div>
+  </div>
 
         {/* How It Works */}
         <div className="bg-white border border-[#DDD] rounded p-4 sm:p-6">
