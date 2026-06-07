@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+:root {
+  --amazon-orange: #FF9900;
+  --amazon-dark: #131921;
+  --amazon-navy: #232F3E;
+  --amazon-light-blue: #37475A;
+  --amazon-link: #007185;
+  --amazon-hover: #C7511F;
+  --amazon-yellow: #FFD814;
+  --amazon-green: #067D62;
+  --text-primary: #0F1111;
+  --text-secondary: #565959;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, "Amazon Ember", Arial, sans-serif;
+  color: #0F1111;
+  background: #EAEDED;
+}
+
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
