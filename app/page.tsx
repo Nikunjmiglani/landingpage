@@ -159,8 +159,8 @@ export default function HomePage() {
                 I sincerely thank our students, recruiters, mentors, and industry partners for placing their trust in us. Together, we continue building brighter futures and stronger careers.
               </p>
               <div className="mt-6">
-                <h4 className="font-bold text-[#232F3E] text-lg sm:text-xl">Dr. Rajesh Sharma</h4>
-                <p className="text-[#FF9900] font-semibold text-sm">Chairman & Founder, Hirevexa</p>
+                <h4 className="font-bold text-[#232F3E] text-lg sm:text-xl">Mr. Siddharth vats</h4>
+                <p className="text-[#FF9900] font-semibold text-sm">Director & Founder, Hirevexa</p>
               </div>
             </div>
             <div className="flex justify-center w-full lg:w-auto">
@@ -169,7 +169,7 @@ export default function HomePage() {
   <span className="text-8xl">👨‍💼</span>
 </div>
                 <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-[#232F3E] text-white px-3 py-1.5 rounded-full text-[10px] sm:text-xs font-semibold shadow-lg whitespace-nowrap">
-                  Chairman & Founder
+                  Director & Founder
                 </div>
               </div>
             </div>
