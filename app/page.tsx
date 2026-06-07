@@ -1,7 +1,9 @@
+"use client"
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Link from "next/link";
-import { Star, Shield, Users, Briefcase, TrendingUp, Award, CheckCircle, BookOpen, ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { Star, Shield, Users, Briefcase, TrendingUp, Award, CheckCircle, BookOpen, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 
 const stats = [
   { label: "Freshers Placed", value: "12,400+", icon: Users },
@@ -11,11 +13,147 @@ const stats = [
 ];
 
 const testimonials = [
-  { name: "Rohan Mehta", role: "Software Engineer @ Infosys", text: "Hirevexa placed me within 3 weeks of completing my B.Tech. The resume service and mock interviews were game-changers.", stars: 5, college: "GGSIPU, Delhi" },
-  { name: "Priya Sharma", role: "Business Analyst @ Deloitte", text: "I had zero idea how to crack corporate interviews. Their GD sessions and mock HR rounds prepared me completely. Got 4 offers!", stars: 5, college: "NMIMS, Mumbai" },
-  { name: "Akash Verma", role: "Data Analyst @ Wipro", text: "The job matching was spot on. They understood my profile and matched me with roles that actually suited my skills.", stars: 4, college: "Anna University" },
+  {
+    name: "Rahul Sharma",
+    college: "SRM University",
+    stars: 5,
+    text: "The resume review and interview preparation sessions helped me gain confidence. I received an offer within a month.",
+    role: "Software Engineer @ TCS",
+  },
+  {
+    name: "Priya Verma",
+    college: "Delhi University",
+    stars: 5,
+    text: "The team guided me throughout the placement process and helped improve my communication skills.",
+    role: "Analyst @ Wipro",
+  },
+  {
+    name: "Aman Gupta",
+    college: "AKTU",
+    stars: 5,
+    text: "Very professional counselling and quick support whenever I had questions.",
+    role: "Associate Engineer @ Infosys",
+  },
+  {
+    name: "Sneha Kapoor",
+    college: "IP University",
+    stars: 5,
+    text: "The mock interviews were extremely useful and helped me identify my weak areas.",
+    role: "Graduate Trainee @ Cognizant",
+  },
+  {
+    name: "Rohit Yadav",
+    college: "Amity University",
+    stars: 5,
+    text: "Excellent guidance from profile creation to final interview rounds.",
+    role: "Support Engineer @ HCL",
+  },
+  {
+    name: "Neha Singh",
+    college: "Galgotias University",
+    stars: 5,
+    text: "I was struggling to get interview calls before joining. Things improved significantly afterwards.",
+    role: "Associate Consultant @ Capgemini",
+  },
+  {
+    name: "Aditya Jain",
+    college: "Bennett University",
+    stars: 5,
+    text: "Helpful mentors and practical advice throughout the placement journey.",
+    role: "Developer @ Accenture",
+  },
+  {
+    name: "Pooja Mishra",
+    college: "Chandigarh University",
+    stars: 5,
+    text: "The process was smooth and transparent. I especially liked the resume feedback.",
+    role: "Business Analyst @ Deloitte",
+  },
+  {
+    name: "Karan Mehta",
+    college: "LPU",
+    stars: 5,
+    text: "Good support and regular updates regarding opportunities.",
+    role: "Associate @ Tech Mahindra",
+  },
+  {
+    name: "Nitin Arora",
+    college: "UPES",
+    stars: 5,
+    text: "The interview preparation sessions made a noticeable difference.",
+    role: "Software Engineer @ LTIMindtree",
+  },
+  {
+    name: "Mehak Arora",
+    college: "SRM University",
+    stars: 5,
+    text: "I appreciated the detailed career guidance and personalised support.",
+    role: "Engineer @ IBM",
+  },
+  {
+    name: "Yash Gupta",
+    college: "KIIT",
+    stars: 5,
+    text: "The consultants were responsive and genuinely interested in helping candidates.",
+    role: "Developer @ Persistent",
+  },
+  {
+    name: "Anjali Sharma",
+    college: "DTU",
+    stars: 5,
+    text: "Great experience from start to finish. Highly recommended for freshers.",
+    role: "Associate Engineer @ Wipro",
+  },
+  {
+    name: "Harsh Vardhan",
+    college: "NSUT",
+    stars: 5,
+    text: "The mock interview feedback was detailed and actionable.",
+    role: "Graduate Engineer @ Infosys",
+  },
+  {
+    name: "Muskan Jain",
+    college: "VIT",
+    stars: 5,
+    text: "I learned how to present my projects effectively during interviews.",
+    role: "Software Developer @ TCS",
+  },
+  {
+    name: "Deepak Kumar",
+    college: "Manipal University",
+    stars: 5,
+    text: "Professional guidance and realistic expectations throughout the process.",
+    role: "Associate Consultant @ EY",
+  },
+  {
+    name: "Ritika Gupta",
+    college: "JSS Noida",
+    stars: 5,
+    text: "Their resume optimization suggestions increased my interview calls.",
+    role: "Analyst @ Genpact",
+  },
+  {
+    name: "Vikas Sharma",
+    college: "Graphic Era University",
+    stars: 5,
+    text: "Very supportive team and excellent placement assistance.",
+    role: "Engineer @ HCL",
+  },
+  {
+    name: "Shreya Agarwal",
+    college: "MIT Pune",
+    stars: 5,
+    text: "The entire process felt structured and easy to follow.",
+    role: "Developer @ Accenture",
+  },
+  {
+    name: "Abhishek Verma",
+    college: "SRM University",
+    stars: 5,
+    text: "Helpful guidance on aptitude preparation and interview strategy.",
+    role: "Software Engineer @ Cognizant",
+  },
 ];
-
 const companies = [
   { name: "TCS", logo: "/logos/tcs.png" },
   { name: "Infosys", logo: "/logos/infosys.png" },
@@ -30,6 +168,29 @@ const companies = [
 ];
 
 export default function HomePage() {
+  const [testimonialIndex, setTestimonialIndex] = useState(0);
+
+const visibleTestimonials = testimonials.slice(
+  testimonialIndex,
+  testimonialIndex + 4
+);
+
+const nextTestimonials = () => {
+  if (testimonialIndex + 4 < testimonials.length) {
+    setTestimonialIndex(testimonialIndex + 4);
+  } else {
+    setTestimonialIndex(0);
+  }
+};
+
+const prevTestimonials = () => {
+  if (testimonialIndex - 4 >= 0) {
+    setTestimonialIndex(testimonialIndex - 4);
+  } else {
+    setTestimonialIndex(Math.max(0, testimonials.length - 4));
+  }
+};
+
   return (
     <div className="min-h-screen bg-[#EAEDED]">
       <Navbar />
@@ -59,28 +220,21 @@ export default function HomePage() {
             <p className="mt-4 text-[#AAAAAA] text-xs">✓ Free registration &nbsp;✓ No hidden charges &nbsp;✓ Placement guarantee*</p>
           </div>
 
-          <div className="flex-1 w-full">
-            <div className="bg-white/10 border border-white/20 rounded-lg p-4 md:p-6 w-full">
-              <p className="text-[#FF9900] font-bold text-sm mb-4">📊 Live Placement Activity</p>
-              {[
-                { name: "Sneha R.", role: "Placed @ TCS", time: "2 mins ago", salary: "₹3.8L" },
-                { name: "Amit K.", role: "Placed @ Wipro", time: "15 mins ago", salary: "₹4.2L" },
-                { name: "Pooja M.", role: "Placed @ Infosys", time: "1 hr ago", salary: "₹3.5L" },
-              ].map(item => (
-                <div key={item.name} className="flex items-center gap-3 py-2 border-b border-white/10 last:border-0">
-                  <div className="w-8 h-8 rounded-full bg-[#FF9900] flex items-center justify-center text-[#131921] font-bold text-xs">
-                    {item.name[0]}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white text-xs font-semibold truncate">{item.name} · {item.role}</p>
-                    <p className="text-[#AAAAAA] text-[11px]">{item.time}</p>
-                  </div>
-                  <span className="text-[#67D26A] text-xs font-bold whitespace-nowrap">{item.salary}</span>
-                </div>
-              ))}
-              <p className="text-center text-[#AAAAAA] text-[11px] mt-3">Showing real-time placements</p>
-            </div>
-          </div>
+         <div className="flex-1 flex justify-center items-center">
+  <div className="relative">
+    {/* Soft glow */}
+    <div className="absolute inset-0 bg-[#FF9900]/20 blur-3xl rounded-full scale-125"></div>
+
+    {/* Round Logo */}
+    <div className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-full bg-white shadow-2xl flex items-center justify-center overflow-hidden">
+      <img
+        src="/logo.png"
+        alt="Company Logo"
+        className="w-[75%] h-[75%] object-contain"
+      />
+    </div>
+  </div>
+</div>
         </div>
       </div>
 
@@ -200,37 +354,80 @@ export default function HomePage() {
         </div>
 
         {/* Testimonials */}
-        <div>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
-            <h2 className="text-lg sm:text-xl font-bold text-[#0F1111]">Customer Reviews</h2>
-            <span className="text-[#007185] text-sm hover:underline cursor-pointer">See all 12,400+ reviews</span>
+<div>
+  <div className="flex items-center justify-between mb-4">
+    <h2 className="text-lg sm:text-xl font-bold text-[#0F1111]">
+      Candidate Success Stories
+    </h2>
+
+    <div className="flex gap-2">
+      <button
+        onClick={prevTestimonials}
+        className="w-10 h-10 rounded-full border border-[#DDD] bg-white hover:bg-[#F7F7F7] flex items-center justify-center transition"
+      >
+        <ChevronLeft size={18} />
+      </button>
+
+      <button
+        onClick={nextTestimonials}
+        className="w-10 h-10 rounded-full border border-[#DDD] bg-white hover:bg-[#F7F7F7] flex items-center justify-center transition"
+      >
+        <ChevronRight size={18} />
+      </button>
+    </div>
+  </div>
+
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    {visibleTestimonials.map((t) => (
+      <div
+        key={t.name}
+        className="bg-white border border-[#DDD] rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow"
+      >
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-10 h-10 rounded-full bg-[#232F3E] text-white flex items-center justify-center font-bold text-sm">
+            {t.name[0]}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {testimonials.map(t => (
-              <div key={t.name} className="bg-white border border-[#DDD] rounded p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-[#232F3E] text-white flex items-center justify-center font-bold text-sm">
-                    {t.name[0]}
-                  </div>
-                  <div>
-                    <p className="font-bold text-sm text-[#0F1111]">{t.name}</p>
-                    <p className="text-xs text-[#565959]">{t.college}</p>
-                  </div>
-                </div>
-                <div className="flex gap-0.5 mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={12} className={i < t.stars ? "fill-[#FF9900] text-[#FF9900]" : "text-[#DDD]"} />
-                  ))}
-                </div>
-                <div className="inline-block bg-[#232F3E] text-white text-[10px] px-2 py-0.5 rounded mb-2 font-semibold">
-                  ✓ Verified
-                </div>
-                <p className="text-xs text-[#0F1111] mb-3">&quot;{t.text}&quot;</p>
-                <p className="text-xs text-[#067D62] font-semibold">{t.role}</p>
-              </div>
-            ))}
+
+          <div>
+            <p className="font-bold text-sm text-[#0F1111]">
+              {t.name}
+            </p>
+
+            <p className="text-xs text-[#565959]">
+              {t.college}
+            </p>
           </div>
         </div>
+
+        <div className="flex gap-0.5 mb-2">
+          {[...Array(5)].map((_, i) => (
+            <Star
+              key={i}
+              size={12}
+              className={
+                i < t.stars
+                  ? "fill-[#FF9900] text-[#FF9900]"
+                  : "text-[#DDD]"
+              }
+            />
+          ))}
+        </div>
+
+        <div className="inline-block bg-[#232F3E] text-white text-[10px] px-2 py-0.5 rounded mb-2 font-semibold">
+          ✓ Verified Candidate
+        </div>
+
+        <p className="text-xs text-[#0F1111] mb-3 leading-relaxed">
+          "{t.text}"
+        </p>
+
+        <p className="text-xs text-[#067D62] font-semibold">
+          {t.role}
+        </p>
+      </div>
+    ))}
+  </div>
+</div>
 
         {/* CTA */}
         <div className="bg-[#232F3E] text-white rounded p-5 sm:p-8 text-center">
