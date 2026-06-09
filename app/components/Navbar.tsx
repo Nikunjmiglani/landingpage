@@ -111,27 +111,78 @@ export default function Navbar() {
         )}
 
         {/* Sub nav */}
-        <div className="bg-[#232F3E] flex items-center gap-1 px-3 py-1 overflow-x-auto scrollbar-hide">
-          <button className="flex items-center gap-1 px-2 py-1 hover:bg-[#37475A] rounded text-sm whitespace-nowrap border border-transparent hover:border-white flex-shrink-0">
-            <Menu size={16} />
-            <span className="font-semibold">All</span>
-          </button>
-          {["Job Placement", "Resume Building", "Interview Prep", "Skill Courses", "Internships", "Campus Drive", "MNC Referrals", "Career Counselling"].map((item) => (
-            <Link
-              key={item}
-              href="#"
-              className="px-2 py-1 hover:bg-[#37475A] rounded text-sm whitespace-nowrap hover:text-white flex-shrink-0"
-            >
-              {item}
-            </Link>
-          ))}
-          <Link
-            href="#"
-            className="px-2 py-1 hover:bg-[#37475A] rounded text-sm whitespace-nowrap text-[#FF9900] font-semibold flex-shrink-0"
-          >
-            🔥 Placement Drive
-          </Link>
-        </div>
+        {/* Sub nav */}
+<div className="bg-[#232F3E] flex items-center gap-1 px-3 py-1 overflow-x-auto scrollbar-hide">
+  <button className="flex items-center gap-1 px-2 py-1 hover:bg-[#37475A] rounded text-sm whitespace-nowrap border border-transparent hover:border-white flex-shrink-0">
+    <Menu size={16} />
+    <span className="font-semibold">All</span>
+  </button>
+
+  <Link
+    href="/about"
+    className="px-2 py-1 hover:bg-[#37475A] rounded text-sm whitespace-nowrap hover:text-white flex-shrink-0"
+  >
+    About Hirevexa
+  </Link>
+
+  <Link
+    href="/resume-building"
+    className="px-2 py-1 hover:bg-[#37475A] rounded text-sm whitespace-nowrap hover:text-white flex-shrink-0"
+  >
+    Resume Building
+  </Link>
+
+  <Link
+    href="/job-placement"
+    className="px-2 py-1 hover:bg-[#37475A] rounded text-sm whitespace-nowrap hover:text-white flex-shrink-0"
+  >
+    Job Placement
+  </Link>
+
+  <Link
+    href="/interview-prep"
+    className="px-2 py-1 hover:bg-[#37475A] rounded text-sm whitespace-nowrap hover:text-white flex-shrink-0"
+  >
+    Interview Prep  
+  </Link>
+
+  <Link
+    href="/skill-courses"
+    className="px-2 py-1 hover:bg-[#37475A] rounded text-sm whitespace-nowrap hover:text-white flex-shrink-0"
+  >
+    Skill Courses
+  </Link>
+
+  <Link
+    href="/internships"
+    className="px-2 py-1 hover:bg-[#37475A] rounded text-sm whitespace-nowrap hover:text-white flex-shrink-0"
+  >
+    Internships
+  </Link>
+
+  <Link
+    href="/campus-drive"
+    className="px-2 py-1 hover:bg-[#37475A] rounded text-sm whitespace-nowrap hover:text-white flex-shrink-0"
+  >
+    Campus Drive
+  </Link>
+
+  <Link
+    href="/mnc-referrals"
+    className="px-2 py-1 hover:bg-[#37475A] rounded text-sm whitespace-nowrap hover:text-white flex-shrink-0"
+  >
+    MNC Referrals
+  </Link>
+
+  <Link
+    href="/career-counselling"
+    className="px-2 py-1 hover:bg-[#37475A] rounded text-sm whitespace-nowrap hover:text-white flex-shrink-0"
+  >
+    Career Counselling
+  </Link>
+
+  
+</div>
       </header>
 
       {/* Mobile menu drawer */}
@@ -181,20 +232,71 @@ export default function Navbar() {
           </div>
 
           {/* Services quick links */}
-          <div className="px-4 py-3 border-t border-[#37475A]">
-            <p className="text-[#CCCCCC] text-xs font-semibold uppercase tracking-wider mb-2">Our Services</p>
-            <div className="grid grid-cols-2 gap-2">
-              {["Job Placement", "Resume Building", "Interview Prep", "Skill Courses", "Internships", "Campus Drive"].map((item) => (
-                <Link
-                  key={item}
-                  href="#"
-                  className="text-sm text-white hover:text-[#FF9900] py-1 transition-colors"
-                >
-                  → {item}
-                </Link>
-              ))}
-            </div>
-          </div>
+<div className="px-4 py-3 border-t border-[#37475A]">
+  <p className="text-[#CCCCCC] text-xs font-semibold uppercase tracking-wider mb-2">
+    Our Services
+  </p>
+
+  <div className="grid grid-cols-2 gap-2">
+
+    <Link
+      href="/resume-building"
+      className="text-sm text-white hover:text-[#FF9900] py-1 transition-colors"
+    >
+      → Resume Building
+    </Link>
+
+    <Link
+      href="/job-placement"
+      className="text-sm text-white hover:text-[#FF9900] py-1 transition-colors"
+    >
+      → Job Placement
+    </Link>
+
+    <Link
+      href="/interview-prep"
+      className="text-sm text-white hover:text-[#FF9900] py-1 transition-colors"
+    >
+      → Interview Prep
+    </Link>
+
+    <Link
+      href="/skill-courses"
+      className="text-sm text-white hover:text-[#FF9900] py-1 transition-colors"
+    >
+      → Skill Courses
+    </Link>
+
+    <Link
+      href="/internships"
+      className="text-sm text-white hover:text-[#FF9900] py-1 transition-colors"
+    >
+      → Internships
+    </Link>
+
+    <Link
+      href="/campus-drive"
+      className="text-sm text-white hover:text-[#FF9900] py-1 transition-colors"
+    >
+      → Campus Drive
+    </Link>
+
+    <Link
+      href="/mnc-referrals"
+      className="text-sm text-white hover:text-[#FF9900] py-1 transition-colors"
+    >
+      → MNC Referrals
+    </Link>
+
+    <Link
+      href="/career-counselling"
+      className="text-sm text-white hover:text-[#FF9900] py-1 transition-colors"
+    >
+      → Career Counselling
+    </Link>
+
+  </div>
+</div>
 
           {/* CTA */}
           <div className="px-4 py-4 border-t border-[#37475A]">
