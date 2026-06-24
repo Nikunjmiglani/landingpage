@@ -133,7 +133,7 @@ export default function Navbar() {
   </Link>
 
   <Link
-    href="/job-placement"
+    href="/jobs"
     className="px-2 py-1 hover:bg-[#37475A] rounded text-sm whitespace-nowrap hover:text-white flex-shrink-0"
   >
     Job Placement
@@ -247,7 +247,7 @@ export default function Navbar() {
     </Link>
 
     <Link
-      href="/job-placement"
+      href="/jobs"
       className="text-sm text-white hover:text-[#FF9900] py-1 transition-colors"
     >
       → Job Placement
