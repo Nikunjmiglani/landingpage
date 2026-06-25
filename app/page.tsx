@@ -292,7 +292,7 @@ export default function HomePage() {
 
           <div className="flex-1 text-center md:text-left">
             <div className="inline-block bg-[#FF9900] text-[#131921] text-[10px] sm:text-xs font-bold px-3 py-1 rounded mb-3 uppercase tracking-wide">
-              #1 Fresher Placement Platform
+              #1 Fresher Placement Platform.
             </div>
             <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold leading-tight mb-3 sm:mb-4">
               Your Career Starts Here.<br />
