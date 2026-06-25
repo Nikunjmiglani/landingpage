@@ -46,26 +46,35 @@ model Candidate {
 }
 
 model Job {
-  id           String        @id @default(cuid())
+  id           String           @id @default(cuid())
   company      String
   role         String
-  openings     Int           @default(1)
-  deadline     DateTime?
+  location     String?
+  jobType      JobType?
+  experience   ExperienceLevel?
+  salary       String?
+  openings     Int              @default(1)
+  skills       String[]
   description  String?
-  isActive     Boolean       @default(true)
-  createdAt    DateTime      @default(now())
+  deadline     DateTime?
+  isActive     Boolean          @default(true)
+  createdAt    DateTime         @default(now())
   applications Application[]
 }
 
 model Application {
-  id          String    @id @default(cuid())
-  candidateId String
-  jobId       String
-  status      AppStatus @default(APPLIED)
-  appliedAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  candidate   Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
-  job         Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  id              String    @id @default(cuid())
+  candidateId     String
+  jobId           String
+  status          AppStatus @default(APPLIED)
+  appliedAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  interviewDate   DateTime?
+  notes           String?
+  offerSalary     String?
+  rejectionReason String?
+  candidate       Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  job             Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   @@unique([candidateId, jobId])
 }
@@ -109,4 +118,19 @@ enum DocStatus {
   APPROVED
   REJECTED
   PENDING
+}
+
+enum JobType {
+  FULL_TIME
+  INTERNSHIP
+  PART_TIME
+  CONTRACT
+  FREELANCE
+}
+
+enum ExperienceLevel {
+  FRESHER
+  ONE_TO_THREE
+  THREE_TO_FIVE
+  FIVE_PLUS
 }

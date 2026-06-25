@@ -1,6 +1,6 @@
 "use client";
-import { useState, Suspense } from "react";
-import { signIn } from "next-auth/react";
+import { useEffect, useState, Suspense } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, ChevronRight, Loader2, AlertCircle, CheckCircle } from "lucide-react";
@@ -9,6 +9,16 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const registered = searchParams.get("registered");
+  const { data: session, status } = useSession();
+  useEffect(() => {
+  if (status !== "authenticated") return;
+
+  if (session.user.role === "ADMIN") {
+    router.replace("/admin");
+  } else {
+    router.replace("/dashboard");
+  }
+}, [session, status, router]);
 
   const [showPass, setShowPass] = useState(false);
   const [tab, setTab] = useState<"candidate" | "admin">("candidate");
@@ -18,26 +28,38 @@ function LoginForm() {
   const [error, setError] = useState("");
 
   const handleLogin = async () => {
-    setError("");
-    if (!email || !password) return setError("Please enter your email and password.");
-    setLoading(true);
+  setError("");
 
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+  if (!email || !password) {
+    setError("Please enter your email and password.");
+    return;
+  }
 
+  setLoading(true);
+
+  const result = await signIn("credentials", {
+    email,
+    password,
+    redirect: false,
+  });
+
+  if (result?.error) {
     setLoading(false);
+    setError("Invalid email or password.");
+    return;
+  }
 
-    if (result?.error) {
-      setError("Invalid email or password. Please try again.");
-      return;
-    }
+  const sessionRes = await fetch("/api/auth/session");
+  const sessionData = await sessionRes.json();
 
-    // Redirect based on tab
-    router.push(tab === "admin" ? "/admin" : "/dashboard");
-  };
+  setLoading(false);
+
+  if (sessionData?.user?.role === "ADMIN") {
+    router.replace("/admin");
+  } else {
+    router.replace("/dashboard");
+  }
+};
 
   return (
     <div className="min-h-screen bg-[#EAEDED] flex flex-col">

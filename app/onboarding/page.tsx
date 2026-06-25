@@ -4,12 +4,20 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle, ChevronRight, Loader2, AlertCircle } from "lucide-react";
 
-const steps = ["Personal Info", "Education", "Preferences", "Resume Upload", "Review"];
+const steps = [
+  "Personal Info",
+  "Education",
+  "Preferences",
+  "Review",
+];
 
 export default function OnboardingPage() {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [resume, setResume] = useState<File | null>(null);
+const [resumeUploading, setResumeUploading] = useState(false);
+const [resumeUploaded, setResumeUploaded] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
     firstName: "", lastName: "", email: "", mobile: "", city: "",
@@ -41,6 +49,35 @@ export default function OnboardingPage() {
   const handleNext = () => {
     if (validateStep()) setStep(s => s + 1);
   };
+
+  async function uploadResume() {
+  if (!resume) return;
+
+  try {
+    setResumeUploading(true);
+
+    const formData = new FormData();
+    formData.append("file", resume);
+
+    const res = await fetch("/api/resume/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setError(data.error || "Resume upload failed");
+      return;
+    }
+
+    setResumeUploaded(true);
+  } catch {
+    setError("Failed to upload resume.");
+  } finally {
+    setResumeUploading(false);
+  }
+}
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -264,25 +301,167 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Step 3: Resume Upload */}
-          {step === 3 && (
-            <div>
-              <h2 className="text-xl font-bold text-[#0F1111] mb-1">Upload Your Resume</h2>
-              <p className="text-[#565959] text-sm mb-5">Upload your current resume. Our experts will review and enhance it.</p>
-              <div className="border-2 border-dashed border-[#DDD] rounded-lg p-10 text-center hover:border-[#007185] transition-colors cursor-pointer bg-[#F0F2F2]">
-                <div className="text-4xl mb-3">📄</div>
-                <p className="text-[#0F1111] font-semibold text-sm mb-1">Drag & drop your resume here</p>
-                <p className="text-[#565959] text-xs mb-4">Supported formats: PDF, DOC, DOCX (max 5MB)</p>
-                <button className="bg-[#232F3E] text-white px-6 py-2 rounded text-sm font-semibold hover:bg-[#37475A] transition-colors">
-                  Browse File
-                </button>
-              </div>
-              <div className="mt-4 bg-[#F0F9FF] border border-[#B0E0F5] rounded p-3">
-                <p className="text-xs text-[#007185] font-semibold mb-1">💡 Don&apos;t have a resume?</p>
-                <p className="text-xs text-[#565959]">No worries! Our expert team will create an ATS-friendly resume for you based on your profile. Just continue and we will reach out.</p>
-              </div>
-            </div>
-          )}
+          {/* Step 3: Review */}
+{step === 3 && (
+  <div>
+
+    <h2 className="text-xl font-bold text-[#0F1111] mb-1">
+      Review Your Profile
+    </h2>
+
+    <p className="text-[#565959] text-sm mb-5">
+      Please verify your information before creating your account.
+    </p>
+
+    <div className="space-y-0 border border-[#DDD] rounded overflow-hidden">
+
+      {[
+        {
+          label: "Name",
+          value: `${form.firstName} ${form.lastName}`,
+        },
+
+        {
+          label: "Email",
+          value: form.email,
+        },
+
+        {
+          label: "Mobile",
+          value: form.mobile,
+        },
+
+        {
+          label: "City",
+          value: form.city || "—",
+        },
+
+        {
+          label: "Degree",
+          value: form.degree || "—",
+        },
+
+        {
+          label: "Branch",
+          value: form.branch || "—",
+        },
+
+        {
+          label: "College",
+          value: form.college || "—",
+        },
+
+        {
+          label: "Graduation Year",
+          value: form.gradYear || "—",
+        },
+
+        {
+          label: "CGPA",
+          value: form.cgpa || "—",
+        },
+
+        {
+          label: "Experience",
+          value: form.experience,
+        },
+
+        {
+          label: "Job Type",
+          value: form.jobType || "—",
+        },
+
+        {
+          label: "Expected Salary",
+          value: form.salary || "—",
+        },
+
+        {
+          label: "Preferred Locations",
+          value:
+            form.locations.length
+              ? form.locations.join(", ")
+              : "—",
+        },
+
+        {
+          label: "Skills",
+          value: form.skills || "—",
+        },
+
+      ].map((row, index) => (
+
+        <div
+          key={row.label}
+          className={`flex items-start gap-3 px-4 py-3 ${
+            index % 2 === 0
+              ? "bg-white"
+              : "bg-[#FAFAFA]"
+          }`}
+        >
+
+          <span className="text-xs text-[#565959] w-36 flex-shrink-0">
+            {row.label}
+          </span>
+
+          <span className="text-xs font-semibold text-[#0F1111]">
+            {row.value}
+          </span>
+
+        </div>
+
+      ))}
+
+    </div>
+
+    <div className="mt-5 bg-[#F0F9FF] border border-[#B0E0F5] rounded-lg p-4">
+
+      <h3 className="font-semibold text-[#007185] mb-2">
+        Resume Upload
+      </h3>
+
+      <p className="text-sm text-[#565959]">
+
+        You can upload your resume immediately after logging into your dashboard.
+
+      </p>
+
+      <p className="text-sm text-[#565959] mt-2">
+
+        Don't have one?
+
+        Our team can help you build an ATS-friendly resume after registration.
+
+      </p>
+
+    </div>
+
+    <div className="mt-5 bg-[#FFFBE6] border border-[#FFD814] rounded-lg p-4">
+
+      <p className="text-sm text-[#565959]">
+
+        🎉 After registration you'll be able to:
+
+      </p>
+
+      <ul className="mt-3 list-disc ml-5 text-sm text-[#565959] space-y-1">
+
+        <li>Upload your resume</li>
+
+        <li>Apply to jobs</li>
+
+        <li>Track application status</li>
+
+        <li>Book counselling sessions</li>
+
+      </ul>
+
+    </div>
+
+  </div>
+)}
+
+         
 
           {/* Step 4: Review */}
           {step === 4 && (

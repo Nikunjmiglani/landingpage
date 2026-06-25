@@ -24,17 +24,38 @@ export async function POST(req: NextRequest) {
 
     if (!body.company || !body.role) {
       return NextResponse.json(
-        { error: "Company and role are required" },
+        {
+          error: "Company and Role are required",
+        },
         { status: 400 }
       );
     }
+
+    const skills =
+      body.skills
+        ?.split(",")
+        .map((skill: string) => skill.trim())
+        .filter(Boolean) || [];
 
     const job = await prisma.job.create({
       data: {
         company: body.company,
         role: body.role,
+
+        location: body.location || null,
+
+        jobType: body.jobType || null,
+
+        experience: body.experience || null,
+
+        salary: body.salary || null,
+
+        skills,
+
         openings: Number(body.openings) || 1,
+
         description: body.description || null,
+
         deadline: body.deadline
           ? new Date(body.deadline)
           : null,
@@ -46,8 +67,12 @@ export async function POST(req: NextRequest) {
     console.error(error);
 
     return NextResponse.json(
-      { error: "Failed to create job" },
-      { status: 500 }
+      {
+        error: "Failed to create job",
+      },
+      {
+        status: 500,
+      }
     );
   }
 }

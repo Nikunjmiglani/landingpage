@@ -10,12 +10,12 @@ import {
 } from "lucide-react";
 
 const appStatusConfig: Record<string, { label: string; color: string; bg: string; icon: typeof Clock }> = {
-  APPLIED:              { label: "Applied",              color: "text-[#565959]", bg: "bg-[#F0F2F2]",  icon: Clock },
-  UNDER_REVIEW:         { label: "Under Review",         color: "text-[#C45500]", bg: "bg-[#FFF3E0]",  icon: AlertCircle },
-  INTERVIEW_SCHEDULED:  { label: "Interview Scheduled",  color: "text-[#007185]", bg: "bg-[#E8F7F9]",  icon: Calendar },
-  OFFER_RECEIVED:       { label: "Offer Received!",      color: "text-[#067D62]", bg: "bg-[#E4F5F0]",  icon: CheckCircle },
-  PLACED:               { label: "Placed",               color: "text-[#067D62]", bg: "bg-[#E4F5F0]",  icon: CheckCircle },
-  REJECTED:             { label: "Rejected",             color: "text-[#CC0C39]", bg: "bg-[#FFF0F0]",  icon: AlertCircle },
+  APPLIED: { label: "Applied", color: "text-[#565959]", bg: "bg-[#F0F2F2]", icon: Clock },
+  UNDER_REVIEW: { label: "Under Review", color: "text-[#C45500]", bg: "bg-[#FFF3E0]", icon: AlertCircle },
+  INTERVIEW_SCHEDULED: { label: "Interview Scheduled", color: "text-[#007185]", bg: "bg-[#E8F7F9]", icon: Calendar },
+  OFFER_RECEIVED: { label: "Offer Received!", color: "text-[#067D62]", bg: "bg-[#E4F5F0]", icon: CheckCircle },
+  PLACED: { label: "Placed", color: "text-[#067D62]", bg: "bg-[#E4F5F0]", icon: CheckCircle },
+  REJECTED: { label: "Rejected", color: "text-[#CC0C39]", bg: "bg-[#FFF0F0]", icon: AlertCircle },
 };
 
 type Application = {
@@ -30,13 +30,18 @@ type Document = {
 type CandidateProfile = {
   id: string; firstName: string; lastName: string;
   degree: string | null; branch: string | null; college: string | null; gradYear: string | null;
-  profileScore: number; status: string;
+ locations: string[];
   applications: Application[];
+  city: string | null;
+  skills: string[];
+cgpa: string | null;
+experience: string | null;
   documents: Document[];
 };
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
+  
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("overview");
   const [profile, setProfile] = useState<CandidateProfile | null>(null);
@@ -68,9 +73,35 @@ export default function DashboardPage() {
 
   const apps = profile?.applications ?? [];
   const docs = profile?.documents ?? [];
-  const offersCount  = apps.filter(a => a.status === "OFFER_RECEIVED" || a.status === "PLACED").length;
+  const offersCount = apps.filter(a => a.status === "OFFER_RECEIVED" || a.status === "PLACED").length;
   const interviewCount = apps.filter(a => a.status === "INTERVIEW_SCHEDULED").length;
+const profileScore = (() => {
+  if (!profile) return 0;
 
+  let completed = 0;
+
+  if (profile.firstName) completed++;
+  if (profile.lastName) completed++;
+  if (profile.city) completed++;
+  if (profile.degree) completed++;
+  if (profile.branch) completed++;
+  if (profile.college) completed++;
+  if (profile.gradYear) completed++;
+  if (profile.cgpa) completed++;
+  if (profile.experience) completed++;
+
+  if (profile.skills.length) completed++;
+
+  if (profile.locations.length) completed++;
+
+  const hasResume = docs.some(
+    d => d.type.toLowerCase() === "resume"
+  );
+
+  if (hasResume) completed++;
+
+  return Math.round((completed / 12) * 100);
+})();
   return (
     <div className="min-h-screen bg-[#EAEDED]">
       <Navbar />
@@ -83,7 +114,7 @@ export default function DashboardPage() {
               {profile?.firstName?.[0] ?? session?.user?.email?.[0]?.toUpperCase() ?? "U"}
             </div>
             <div>
-              <p className="text-xs text-[#CCCCCC]">Hello,</p>
+              <p className="text-xs text-[#CCCCCC]">Welcome,</p>
               <p className="text-lg font-bold">{profile ? `${profile.firstName} ${profile.lastName}` : session?.user?.email}</p>
               <p className="text-xs text-[#AAAAAA]">
                 {[profile?.degree, profile?.college, profile?.gradYear ? `${profile.gradYear} Passout` : null].filter(Boolean).join(" · ") || "Complete your profile to get started"}
@@ -92,13 +123,21 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <p className="text-[#FF9900] font-bold text-sm">Profile: {profile?.profileScore ?? 0}% complete</p>
-              <div className="w-40 h-2 bg-[#37475A] rounded-full mt-1">
-                <div className="h-2 bg-[#FF9900] rounded-full transition-all" style={{ width: `${profile?.profileScore ?? 0}%` }} />
-              </div>
+             <p className="text-[#FF9900] font-bold text-sm">
+  Profile: {profileScore}% complete
+</p>
+
+<div className="w-40 h-2 bg-[#37475A] rounded-full mt-1">
+  <div
+    className="h-2 bg-[#FF9900] rounded-full transition-all"
+    style={{
+      width: `${profileScore}%`,
+    }}
+  />
+</div>
             </div>
             <div className="flex flex-col gap-1">
-              <Link href="/onboarding" className="bg-[#FF9900] text-[#131921] font-bold text-xs px-4 py-2 rounded hover:bg-[#FA8900]">
+              <Link href="/dashboard/profile" className="bg-[#FF9900] text-[#131921] font-bold text-xs px-4 py-2 rounded hover:bg-[#FA8900]">
                 Complete Profile
               </Link>
               <button onClick={() => signOut({ callbackUrl: "/login" })}
@@ -108,14 +147,63 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+<div className="grid md:grid-cols-3 gap-4 mb-6">
 
+  <Link
+    href="/jobs"
+    className="bg-white border rounded-lg p-5 hover:border-[#FF9900] transition"
+  >
+    <Briefcase className="w-8 h-8 text-[#FF9900]" />
+
+    <h3 className="font-bold mt-3">
+      Browse Jobs
+    </h3>
+
+    <p className="text-sm text-gray-500 mt-2">
+      Find the latest openings.
+    </p>
+
+  </Link>
+
+  <Link
+    href="/dashboard/resume"
+    className="bg-white border rounded-lg p-5 hover:border-[#FF9900] transition"
+  >
+    <FileText className="w-8 h-8 text-[#FF9900]" />
+
+    <h3 className="font-bold mt-3">
+      Resume
+    </h3>
+
+    <p className="text-sm text-gray-500 mt-2">
+      Upload or replace your resume.
+    </p>
+
+  </Link>
+
+  <Link
+    href="/dashboard/profile"
+    className="bg-white border rounded-lg p-5 hover:border-[#FF9900] transition"
+  >
+    <User className="w-8 h-8 text-[#FF9900]" />
+
+    <h3 className="font-bold mt-3">
+      Update Profile
+    </h3>
+
+    <p className="text-sm text-gray-500 mt-2">
+      Improve your profile score.
+    </p>
+
+  </Link>
+
+</div>
         {/* Tabs */}
         <div className="flex gap-0 border-b border-[#DDD] bg-white rounded-t overflow-x-auto">
           {["overview", "applications", "sessions", "documents"].map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)}
-              className={`px-5 py-3 text-sm font-semibold capitalize whitespace-nowrap border-b-2 transition-colors ${
-                activeTab === tab ? "border-[#FF9900] text-[#131921]" : "border-transparent text-[#565959] hover:text-[#131921]"
-              }`}>
+              className={`px-5 py-3 text-sm font-semibold capitalize whitespace-nowrap border-b-2 transition-colors ${activeTab === tab ? "border-[#FF9900] text-[#131921]" : "border-transparent text-[#565959] hover:text-[#131921]"
+                }`}>
               {tab}
             </button>
           ))}
@@ -124,12 +212,38 @@ export default function DashboardPage() {
         {/* Overview */}
         {activeTab === "overview" && (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
               {[
-                { label: "Applications Sent",    value: apps.length,    sub: "Total applied",          icon: Briefcase,  color: "text-[#007185]" },
-                { label: "Interviews Scheduled", value: interviewCount, sub: "Upcoming interviews",    icon: Calendar,   color: "text-[#C45500]" },
-                { label: "Offers Received",      value: offersCount,    sub: "Active offers",          icon: CheckCircle,color: "text-[#067D62]" },
-                { label: "Profile Strength",     value: `${profile?.profileScore ?? 0}%`, sub: profile?.profileScore ?? 0 >= 80 ? "Good — keep going" : "Needs improvement", icon: TrendingUp, color: "text-[#FF9900]" },
+                { label: "Applications Sent", value: apps.length, sub: "Total applied", icon: Briefcase, color: "text-[#007185]" },
+                { label: "Interviews Scheduled", value: interviewCount, sub: "Upcoming interviews", icon: Calendar, color: "text-[#C45500]" },
+                { label: "Offers Received", value: offersCount, sub: "Active offers", icon: CheckCircle, color: "text-[#067D62]" },
+                {
+                  label: "Resume",
+                  value: docs.some(
+                    d => d.type.toLowerCase() === "resume"
+                  )
+                    ? "Uploaded"
+                    : "Missing",
+                  sub: "Latest Resume",
+                  icon: FileText,
+                  color: docs.some(
+                    d => d.type.toLowerCase() === "resume"
+                  )
+                    ? "text-[#067D62]"
+                    : "text-[#CC0C39]",
+                },
+               {
+  label: "Profile Strength",
+  value: `${profileScore}%`,
+  sub:
+    profileScore >= 80
+      ? "Excellent Profile"
+      : profileScore >= 60
+      ? "Good Progress"
+      : "Needs Improvement",
+  icon: TrendingUp,
+  color: "text-[#FF9900]",
+},
               ].map(k => (
                 <div key={k.label} className="bg-white border border-[#DDD] rounded p-4 shadow-sm">
                   <k.icon size={20} className={`${k.color} mb-2`} />
@@ -152,7 +266,7 @@ export default function DashboardPage() {
                 {apps.length === 0 ? (
                   <div className="text-center py-10 text-[#565959] text-sm">
                     No applications yet.<br />
-                    <Link href="#" className="text-[#007185] hover:underline text-xs mt-1 inline-block">Browse open jobs →</Link>
+                    <Link href="/jobs" className="text-[#007185] hover:underline text-xs mt-1 inline-block">Browse open jobs →</Link>
                   </div>
                 ) : apps.slice(0, 4).map(app => {
                   const cfg = appStatusConfig[app.status] ?? appStatusConfig.APPLIED;
@@ -183,10 +297,14 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   {[
-                    { label: "Basic info filled",   done: !!(profile?.firstName && profile?.lastName) },
-                    { label: "Education added",     done: !!(profile?.degree && profile?.college) },
-                    { label: "Resume uploaded",     done: docs.some(d => d.type === "resume") },
-                    { label: "Applied to a job",    done: apps.length > 0 },
+                    { label: "Basic info filled", done: !!(profile?.firstName && profile?.lastName) },
+                    { label: "Education added", done: !!(profile?.degree && profile?.college) },
+                    {
+                      label: "Resume uploaded", done: docs.some(
+                        d => d.type.toLowerCase() === "resume"
+                      )
+                    },
+                    { label: "Applied to a job", done: apps.length > 0 },
                     { label: "Interview scheduled", done: interviewCount > 0 },
                   ].map(item => (
                     <div key={item.label} className="flex items-center gap-3 px-4 py-3 border-b border-[#EAEDED] last:border-0">
@@ -198,8 +316,8 @@ export default function DashboardPage() {
                   ))}
                 </div>
                 <div className="px-4 py-3">
-                  <Link href="/onboarding" className="block w-full text-center bg-[#FFD814] text-[#131921] font-bold text-xs py-2 rounded border border-[#FCD200]">
-                    Complete Profile
+                  <Link href="/dashboard/profile" className="block w-full text-center bg-[#FFD814] text-[#131921] font-bold text-xs py-2 rounded border border-[#FCD200]">
+                    Edit Profile
                   </Link>
                 </div>
               </div>
@@ -245,7 +363,7 @@ export default function DashboardPage() {
             <div className="space-y-3">
               {[
                 { title: "1:1 Career Counselling", counsellor: "Ms. Anita Joshi", date: "Scheduled by admin", type: "Upcoming", mode: "Video Call" },
-                { title: "Resume Review Session",  counsellor: "Ms. Divya Nair",  date: "After profile review", type: "Pending", mode: "Video Call" },
+                { title: "Resume Review Session", counsellor: "Ms. Divya Nair", date: "After profile review", type: "Pending", mode: "Video Call" },
               ].map(s => (
                 <div key={s.title} className="flex items-start gap-4 p-4 border border-[#DDD] rounded">
                   <div className="w-10 h-10 rounded-full bg-[#232F3E] text-white flex items-center justify-center flex-shrink-0">
@@ -280,18 +398,20 @@ export default function DashboardPage() {
                       <p className="text-sm font-semibold text-[#0F1111] truncate">{doc.name}</p>
                       <p className="text-xs text-[#565959]">{new Date(doc.uploadedAt).toLocaleDateString()}</p>
                     </div>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
-                      doc.status === "APPROVED" ? "bg-[#E4F5F0] text-[#067D62]" :
-                      doc.status === "PENDING"  ? "bg-[#FFEEDD] text-[#CC0C39]" :
-                      "bg-[#F0F2F2] text-[#565959]"
-                    }`}>{doc.status}</span>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${doc.status === "APPROVED" ? "bg-[#E4F5F0] text-[#067D62]" :
+                        doc.status === "PENDING" ? "bg-[#FFEEDD] text-[#CC0C39]" :
+                          "bg-[#F0F2F2] text-[#565959]"
+                      }`}>{doc.status}</span>
                   </div>
                 ))}
               </div>
             )}
-            <button className="border-2 border-dashed border-[#DDD] w-full py-4 rounded text-sm text-[#565959] hover:border-[#007185] hover:text-[#007185] transition-colors">
-              + Upload New Document
-            </button>
+            <Link
+              href="/dashboard/resume"
+              className="block w-full border-2 border-dashed border-[#DDD] py-4 rounded text-center text-sm text-[#565959] hover:border-[#FF9900] hover:text-[#FF9900] transition-colors"
+            >
+              + Upload / Manage Resume
+            </Link>
           </div>
         )}
       </div>
