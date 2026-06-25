@@ -335,7 +335,7 @@ export default function HomePage() {
       {/* Info strip */}
       <div className="bg-[#232F3E] text-white py-2.5 px-4">
         <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-2 sm:gap-6 text-[10px] sm:text-xs text-[#CCCCCC] text-center">
-          <span>🚀 <strong className="text-white">12,400+</strong> placed this year</span>
+          <span>🚀 <strong className="text-white">12,000+</strong> placed this year</span>
           <span className="hidden sm:inline">📞 <strong className="text-white">Free counselling</strong> every Monday</span>
           <span>💼 <strong className="text-white">380+ hiring partners</strong></span>
           <Link href="/onboarding" className="text-[#FF9900] hover:underline font-semibold">
