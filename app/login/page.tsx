@@ -12,14 +12,15 @@ function LoginForm() {
   const callbackUrl = searchParams.get("callbackUrl");
   const { data: session, status } = useSession();
 
+  // If already logged in on page load, redirect immediately
   useEffect(() => {
     if (status !== "authenticated") return;
     if (session?.user?.role === "ADMIN") {
-      router.replace(callbackUrl?.startsWith("/admin") ? callbackUrl : "/admin");
+      window.location.href = callbackUrl?.startsWith("/admin") ? callbackUrl : "/admin";
     } else {
-      router.replace(callbackUrl?.startsWith("/dashboard") ? callbackUrl : "/dashboard");
+      window.location.href = callbackUrl?.startsWith("/dashboard") ? callbackUrl : "/dashboard";
     }
-  }, [session, status, router, callbackUrl]);
+  }, [session, status, callbackUrl]);
 
   const [showPass, setShowPass] = useState(false);
   const [tab, setTab] = useState<"candidate" | "admin">("candidate");
@@ -56,20 +57,28 @@ function LoginForm() {
     setLoading(true);
 
     const result = await signIn("credentials", {
-      email,
+      email: email.toLowerCase().trim(),
       password,
       redirect: false,
     });
 
-    setLoading(false);
-
     if (result?.error) {
+      setLoading(false);
       setError("Invalid email or password.");
       return;
     }
 
-    // Trigger session refresh — useEffect above handles the redirect
-    router.refresh();
+    // Fetch session to get role, then hard redirect
+    const sessionRes = await fetch("/api/auth/session");
+    const sessionData = await sessionRes.json();
+
+    setLoading(false);
+
+    if (sessionData?.user?.role === "ADMIN") {
+      window.location.href = callbackUrl?.startsWith("/admin") ? callbackUrl : "/admin";
+    } else {
+      window.location.href = callbackUrl?.startsWith("/dashboard") ? callbackUrl : "/dashboard";
+    }
   };
 
   return (
@@ -83,19 +92,27 @@ function LoginForm() {
 
       <div className="flex-1 flex items-center justify-center px-4 py-10">
         <div className="w-full max-w-sm">
+
           {registered && (
             <div className="flex items-center gap-2 bg-[#E4F5F0] border border-[#067D62] rounded p-3 mb-4 text-sm text-[#067D62]">
-              <CheckCircle size={16} /> Account created! Please sign in to continue.
+              <CheckCircle size={16} />
+              Account created! Please sign in to continue.
             </div>
           )}
 
           <div className="flex mb-4 border border-[#DDD] rounded overflow-hidden">
-            <button onClick={() => setTab("candidate")}
-              className={`flex-1 py-2 text-sm font-semibold transition-colors ${tab === "candidate" ? "bg-[#232F3E] text-white" : "bg-white text-[#565959] hover:bg-[#F0F2F2]"}`}>
+            <button
+              onClick={() => setTab("candidate")}
+              className={`flex-1 py-2 text-sm font-semibold transition-colors ${
+                tab === "candidate" ? "bg-[#232F3E] text-white" : "bg-white text-[#565959] hover:bg-[#F0F2F2]"
+              }`}>
               Candidate Login
             </button>
-            <button onClick={() => setTab("admin")}
-              className={`flex-1 py-2 text-sm font-semibold transition-colors ${tab === "admin" ? "bg-[#232F3E] text-white" : "bg-white text-[#565959] hover:bg-[#F0F2F2]"}`}>
+            <button
+              onClick={() => setTab("admin")}
+              className={`flex-1 py-2 text-sm font-semibold transition-colors ${
+                tab === "admin" ? "bg-[#232F3E] text-white" : "bg-white text-[#565959] hover:bg-[#F0F2F2]"
+              }`}>
               Admin / Staff
             </button>
           </div>
@@ -110,34 +127,50 @@ function LoginForm() {
 
             {error && (
               <div className="flex items-center gap-2 bg-[#FFF0F0] border border-[#CC0C39] rounded p-3 mb-4 text-sm text-[#CC0C39]">
-                <AlertCircle size={16} className="flex-shrink-0" /> {error}
+                <AlertCircle size={16} className="flex-shrink-0" />
+                {error}
               </div>
             )}
 
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-[#0F1111] mb-1">Email</label>
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
                   onKeyDown={e => e.key === "Enter" && handleLogin()}
                   className="w-full border border-[#888] rounded px-3 py-2 text-sm outline-none focus:border-[#007185] focus:ring-1 focus:ring-[#007185]"
-                  placeholder="you@example.com" />
+                  placeholder="you@example.com"
+                />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-[#0F1111] mb-1">Password</label>
                 <div className="relative">
-                  <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)}
+                  <input
+                    type={showPass ? "text" : "password"}
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
                     onKeyDown={e => e.key === "Enter" && handleLogin()}
                     className="w-full border border-[#888] rounded px-3 py-2 text-sm outline-none focus:border-[#007185] focus:ring-1 focus:ring-[#007185] pr-10"
-                    placeholder="Enter password" />
-                  <button type="button" onClick={() => setShowPass(!showPass)}
+                    placeholder="Enter password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPass(!showPass)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-[#565959]">
                     {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
               </div>
-              <button onClick={handleLogin} disabled={loading}
+
+              <button
+                onClick={handleLogin}
+                disabled={loading}
                 className="w-full bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-bold py-2 rounded text-sm border border-[#FCD200] transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
-                {loading ? <><Loader2 size={16} className="animate-spin" /> Signing in...</> : "Sign In"}
+                {loading
+                  ? <><Loader2 size={16} className="animate-spin" /> Signing in...</>
+                  : "Sign In"}
               </button>
             </div>
 
@@ -149,17 +182,24 @@ function LoginForm() {
           </div>
 
           <div className="relative my-5">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[#DDD]" /></div>
-            <div className="relative flex justify-center text-xs text-[#767676] bg-[#EAEDED] px-3">New to Hirevexa?</div>
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-[#DDD]" />
+            </div>
+            <div className="relative flex justify-center text-xs text-[#767676] bg-[#EAEDED] px-3">
+              New to Hirevexa?
+            </div>
           </div>
 
-          <Link href="/onboarding"
+          <Link
+            href="/onboarding"
             className="flex items-center justify-center gap-1 w-full text-center bg-white border border-[#D5D9D9] hover:bg-[#F0F2F2] text-[#0F1111] font-semibold py-2 rounded text-sm shadow-sm">
             Create your Hirevexa account <ChevronRight size={14} />
           </Link>
 
           <div className="mt-4 text-center">
-            <Link href="#" className="text-[#007185] text-sm hover:underline hover:text-[#C7511F]">Forgot your password?</Link>
+            <Link href="#" className="text-[#007185] text-sm hover:underline hover:text-[#C7511F]">
+              Forgot your password?
+            </Link>
           </div>
         </div>
       </div>
