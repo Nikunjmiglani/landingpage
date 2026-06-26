@@ -375,7 +375,7 @@ export default function HomePage() {
           <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "24px 24px" }} />
           <div className="relative">
             <h2 className="text-2xl sm:text-4xl font-bold mb-3">Ready to Start Your Career Journey?</h2>
-            <p className="text-gray-300 mb-8 text-sm sm:text-base max-w-xl mx-auto">Join 12,400+ freshers who trusted HireVexa and landed their dream jobs.</p>
+            <p className="text-gray-300 mb-8 text-sm sm:text-base max-w-xl mx-auto">Join 12,000+ freshers who trusted HireVexa and landed their dream jobs.</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/onboarding" className="inline-flex items-center justify-center gap-2 bg-[#FF9900] hover:bg-[#e88d00] text-gray-900 font-bold px-10 py-4 rounded-xl text-sm transition-all shadow-lg hover:scale-[1.02]">
                 Create Free Account <ArrowRight size={16} />

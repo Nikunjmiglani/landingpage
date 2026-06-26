@@ -50,19 +50,10 @@ export const courseSchema = z.object({
   level: z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED"]),
 
   // coerce handles both number input from RHF and string from JSON
-  price: z.coerce
-    .number()
-    .min(0, "Price cannot be negative"),
-
-  discount: z.coerce
-    .number()
-    .min(0, "Discount cannot be negative")
-    .max(100, "Discount cannot exceed 100"),
-
-  // coerce handles checkbox: true/false/undefined/"true"/"false"
-  featured: z.coerce.boolean(),
-
-  published: z.coerce.boolean(),
+  price: z.preprocess(val => Number(val ?? 0), z.number().min(0, "Price cannot be negative")),
+discount: z.preprocess(val => Number(val ?? 0), z.number().min(0, "Discount cannot be negative").max(100, "Discount cannot exceed 100")),
+featured: z.preprocess(val => Boolean(val), z.boolean()),
+published: z.preprocess(val => Boolean(val), z.boolean()),
 
   categoryId: z.string().optional().nullable(),
 });
