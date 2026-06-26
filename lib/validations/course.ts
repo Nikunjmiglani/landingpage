@@ -29,7 +29,6 @@ export const courseSchema = z.object({
     .min(20, "Description must be at least 20 characters"),
 
   thumbnailUrl: z.string().trim().optional().nullable(),
-
   previewVideoUrl: z.string().trim().optional().nullable(),
 
   instructor: z
@@ -49,11 +48,15 @@ export const courseSchema = z.object({
 
   level: z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED"]),
 
-  // coerce handles both number input from RHF and string from JSON
-  price: z.preprocess(val => Number(val ?? 0), z.number().min(0, "Price cannot be negative")),
-discount: z.preprocess(val => Number(val ?? 0), z.number().min(0, "Discount cannot be negative").max(100, "Discount cannot exceed 100")),
-featured: z.preprocess(val => Boolean(val), z.boolean()),
-published: z.preprocess(val => Boolean(val), z.boolean()),
+  price: z.number().min(0, "Price cannot be negative"),
+
+  discount: z
+    .number()
+    .min(0, "Discount cannot be negative")
+    .max(100, "Discount cannot exceed 100"),
+
+  featured: z.boolean(),
+  published: z.boolean(),
 
   categoryId: z.string().optional().nullable(),
 });
