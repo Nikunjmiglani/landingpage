@@ -1,874 +1,219 @@
 "use client";
-
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Navbar from "../../components/Navbar";
+import { ArrowLeft, Save, Loader2, CheckCircle } from "lucide-react";
+import { toast } from "sonner";
 
 type Profile = {
-  firstName: string;
-  lastName: string;
-  city: string;
-  degree: string;
-  branch: string;
-  college: string;
-  gradYear: string;
-  cgpa: string;
-  experience: string;
-  jobType: string;
-  salary: string;
-  locations: string[];
-  skills: string[];
-  resumeUrl: string | null;
+  firstName: string; lastName: string; city: string; degree: string; branch: string;
+  college: string; gradYear: string; cgpa: string; experience: string; jobType: string;
+  salary: string; locations: string[]; skills: string[]; resumeUrl: string | null;
 };
 
-const locationOptions = [
-  "Delhi NCR",
-  "Mumbai",
-  "Bangalore",
-  "Hyderabad",
-  "Chennai",
-  "Pune",
-  "Kolkata",
-  "Any Location",
-];
+const LOCATION_OPTIONS = ["Delhi NCR","Mumbai","Bangalore","Hyderabad","Chennai","Pune","Kolkata","Any Location"];
+const DEGREE_OPTIONS = ["B.Tech / B.E.","BCA","B.Sc","B.Com","BBA","MCA","MBA","M.Tech"];
+const EXP_OPTIONS = ["fresher","0-1 years","1-2 years","2-5 years"];
+const JOB_TYPE_OPTIONS = ["Full-time Employment","Internship + PPO","Remote / WFH","Startup","Government / PSU"];
+const SALARY_OPTIONS = ["2–4 LPA","4–6 LPA","6–10 LPA","10+ LPA"];
 
 export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-
-  const [profile, setProfile] =
-    useState<Profile>({
-      firstName: "",
-      lastName: "",
-      city: "",
-      degree: "",
-      branch: "",
-      college: "",
-      gradYear: "",
-      cgpa: "",
-      experience: "fresher",
-      jobType: "",
-      salary: "",
-      locations: [],
-      skills: [],
-      resumeUrl: null,
-    });
+  const [profile, setProfile] = useState<Profile>({
+    firstName: "", lastName: "", city: "", degree: "", branch: "", college: "",
+    gradYear: "", cgpa: "", experience: "fresher", jobType: "", salary: "",
+    locations: [], skills: [], resumeUrl: null,
+  });
 
   useEffect(() => {
-    fetchProfile();
+    fetch("/api/candidate/profile").then(r => r.json())
+      .then(d => setProfile({ ...d, locations: d.locations || [], skills: d.skills || [] }))
+      .catch(console.error).finally(() => setLoading(false));
   }, []);
 
-  async function fetchProfile() {
-    try {
-      const res = await fetch(
-        "/api/candidate/profile"
-      );
+  const set = (k: keyof Profile, v: any) => setProfile(p => ({ ...p, [k]: v }));
 
-      const data = await res.json();
-
-      setProfile({
-        ...data,
-        locations:
-          data.locations || [],
-        skills: data.skills || [],
-      });
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function saveProfile(
-    e: React.FormEvent
-  ) {
+  async function save(e: React.FormEvent) {
     e.preventDefault();
-
     setSaving(true);
-
     try {
-      const res = await fetch(
-        "/api/candidate/profile",
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-          body: JSON.stringify(profile),
-        }
-      );
-
-      if (!res.ok) {
-        alert(
-          "Failed to update profile."
-        );
-        return;
-      }
-
-      alert(
-        "Profile updated successfully."
-      );
-    } catch {
-      alert("Something went wrong.");
-    } finally {
-      setSaving(false);
-    }
+      const res = await fetch("/api/candidate/profile", {
+        method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(profile),
+      });
+      if (!res.ok) { toast.error("Failed to update profile."); return; }
+      toast.success("Profile updated successfully.");
+    } catch { toast.error("Something went wrong."); } finally { setSaving(false); }
   }
 
   const profileScore = useMemo(() => {
-    const fields = [
-      profile.firstName,
-      profile.lastName,
-      profile.city,
-      profile.degree,
-      profile.branch,
-      profile.college,
-      profile.gradYear,
-      profile.cgpa,
-      profile.jobType,
-      profile.salary,
-      profile.experience,
-      profile.resumeUrl,
-    ];
-
-    let score = 0;
-
-    fields.forEach((item) => {
-      if (item) score++;
-    });
-
-    if (profile.skills.length)
-      score++;
-
-    if (profile.locations.length)
-      score++;
-
-    return Math.round(
-      (score / 14) * 100
-    );
+    const checks = [profile.firstName, profile.lastName, profile.city, profile.degree, profile.branch,
+      profile.college, profile.gradYear, profile.cgpa, profile.jobType, profile.salary, profile.experience,
+      profile.resumeUrl, profile.skills.length > 0, profile.locations.length > 0];
+    return Math.round((checks.filter(Boolean).length / checks.length) * 100);
   }, [profile]);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        Loading Profile...
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-[#F5F6F8]">
-
-      <div className="max-w-6xl mx-auto py-10 px-5">
-
-        <div className="flex justify-between items-center mb-8">
-
-          <div>
-
-            <h1 className="text-4xl font-bold">
-              Edit Profile
-            </h1>
-
-            <p className="text-gray-500 mt-2">
-              Keep your information up
-              to date for better job
-              matches.
-            </p>
-
-          </div>
-
-          <div className="text-right">
-
-            <p className="text-sm text-gray-500">
-              Profile Completion
-            </p>
-
-            <h2 className="text-3xl font-bold text-[#FF9900]">
-              {profileScore}%
-            </h2>
-
-          </div>
-
-        </div>
-
-        <div className="bg-white rounded-xl border shadow-sm p-8">
-
-          <div className="flex justify-between items-center mb-8">
-
-            <div>
-
-              <h2 className="text-2xl font-bold">
-                Personal Information
-              </h2>
-
-              <p className="text-gray-500 mt-1">
-                Update your personal
-                details.
-              </p>
-
-            </div>
-
-            <Link
-              href="/dashboard/resume"
-              className="bg-[#FF9900] px-5 py-3 rounded-lg font-semibold"
-            >
-              Manage Resume
-            </Link>
-
-          </div>
-
-          <form
-            onSubmit={saveProfile}
-            className="space-y-8"
-          >
-
-            <div className="grid md:grid-cols-2 gap-6">
-
-              <div>
-
-                <label className="block font-medium mb-2">
-                  First Name
-                </label>
-
-                <input
-                  value={profile.firstName}
-                  onChange={(e) =>
-                    setProfile({
-                      ...profile,
-                      firstName:
-                        e.target.value,
-                    })
-                  }
-                  className="w-full border rounded-lg p-3"
-                />
-
-              </div>
-
-              <div>
-
-                <label className="block font-medium mb-2">
-                  Last Name
-                </label>
-
-                <input
-                  value={profile.lastName}
-                  onChange={(e) =>
-                    setProfile({
-                      ...profile,
-                      lastName:
-                        e.target.value,
-                    })
-                  }
-                  className="w-full border rounded-lg p-3"
-                />
-
-              </div>
-
-              <div>
-
-                <label className="block font-medium mb-2">
-                  Current City
-                </label>
-
-                <input
-                  value={profile.city}
-                  onChange={(e) =>
-                    setProfile({
-                      ...profile,
-                      city:
-                        e.target.value,
-                    })
-                  }
-                  className="w-full border rounded-lg p-3"
-                />
-
-              </div>
-
-              <div>
-
-                <label className="block font-medium mb-2">
-                  Experience
-                </label>
-
-                <select
-                  value={
-                    profile.experience
-                  }
-                  onChange={(e) =>
-                    setProfile({
-                      ...profile,
-                      experience:
-                        e.target.value,
-                    })
-                  }
-                  className="w-full border rounded-lg p-3"
-                >
-                  <option>
-                    fresher
-                  </option>
-
-                  <option>
-                    0-1 years
-                  </option>
-
-                  <option>
-                    1-2 years
-                  </option>
-
-                  <option>
-                    2-5 years
-                  </option>
-
-                </select>
-
-              </div>
-
-            </div>
-
-            <hr />
-                        {/* Education */}
-
-            <div>
-
-              <h2 className="text-2xl font-bold mb-6">
-                Education
-              </h2>
-
-              <div className="grid md:grid-cols-2 gap-6">
-
-                <div>
-
-                  <label className="block font-medium mb-2">
-                    Degree
-                  </label>
-
-                  <select
-                    value={profile.degree}
-                    onChange={(e) =>
-                      setProfile({
-                        ...profile,
-                        degree: e.target.value,
-                      })
-                    }
-                    className="w-full border rounded-lg p-3"
-                  >
-                    <option value="">
-                      Select Degree
-                    </option>
-
-                    <option>
-                      B.Tech / B.E.
-                    </option>
-
-                    <option>
-                      BCA
-                    </option>
-
-                    <option>
-                      B.Sc
-                    </option>
-
-                    <option>
-                      B.Com
-                    </option>
-
-                    <option>
-                      BBA
-                    </option>
-
-                    <option>
-                      MCA
-                    </option>
-
-                    <option>
-                      MBA
-                    </option>
-
-                    <option>
-                      M.Tech
-                    </option>
-
-                  </select>
-
-                </div>
-
-                <div>
-
-                  <label className="block font-medium mb-2">
-                    Branch
-                  </label>
-
-                  <input
-                    value={profile.branch}
-                    onChange={(e) =>
-                      setProfile({
-                        ...profile,
-                        branch:
-                          e.target.value,
-                      })
-                    }
-                    className="w-full border rounded-lg p-3"
-                  />
-
-                </div>
-
-                <div>
-
-                  <label className="block font-medium mb-2">
-                    College
-                  </label>
-
-                  <input
-                    value={profile.college}
-                    onChange={(e) =>
-                      setProfile({
-                        ...profile,
-                        college:
-                          e.target.value,
-                      })
-                    }
-                    className="w-full border rounded-lg p-3"
-                  />
-
-                </div>
-
-                <div>
-
-                  <label className="block font-medium mb-2">
-                    Graduation Year
-                  </label>
-
-                  <select
-                    value={
-                      profile.gradYear
-                    }
-                    onChange={(e) =>
-                      setProfile({
-                        ...profile,
-                        gradYear:
-                          e.target.value,
-                      })
-                    }
-                    className="w-full border rounded-lg p-3"
-                  >
-                    <option value="">
-                      Select
-                    </option>
-
-                    {Array.from(
-                      {
-                        length: 10,
-                      },
-                      (_, i) =>
-                        2024 +
-                        i
-                    ).map((year) => (
-                      <option
-                        key={year}
-                      >
-                        {year}
-                      </option>
-                    ))}
-
-                  </select>
-
-                </div>
-
-                <div>
-
-                  <label className="block font-medium mb-2">
-                    CGPA
-                  </label>
-
-                  <input
-                    value={profile.cgpa}
-                    onChange={(e) =>
-                      setProfile({
-                        ...profile,
-                        cgpa:
-                          e.target.value,
-                      })
-                    }
-                    className="w-full border rounded-lg p-3"
-                  />
-
-                </div>
-
-              </div>
-
-            </div>
-
-            <hr />
-
-            {/* Job Preferences */}
-
-            <div>
-
-              <h2 className="text-2xl font-bold mb-6">
-                Job Preferences
-              </h2>
-
-              <div className="grid md:grid-cols-2 gap-6">
-
-                <div>
-
-                  <label className="block font-medium mb-2">
-                    Preferred Job Type
-                  </label>
-
-                  <select
-                    value={
-                      profile.jobType
-                    }
-                    onChange={(e) =>
-                      setProfile({
-                        ...profile,
-                        jobType:
-                          e.target.value,
-                      })
-                    }
-                    className="w-full border rounded-lg p-3"
-                  >
-                    <option value="">
-                      Select
-                    </option>
-
-                    <option>
-                      Full-time Employment
-                    </option>
-
-                    <option>
-                      Internship + PPO
-                    </option>
-
-                    <option>
-                      Remote / WFH
-                    </option>
-
-                    <option>
-                      Startup
-                    </option>
-
-                    <option>
-                      Government / PSU
-                    </option>
-
-                  </select>
-
-                </div>
-
-                <div>
-
-                  <label className="block font-medium mb-2">
-                    Expected Salary
-                  </label>
-
-                  <select
-                    value={
-                      profile.salary
-                    }
-                    onChange={(e) =>
-                      setProfile({
-                        ...profile,
-                        salary:
-                          e.target.value,
-                      })
-                    }
-                    className="w-full border rounded-lg p-3"
-                  >
-                    <option value="">
-                      Select
-                    </option>
-
-                    <option>
-                      2–4 LPA
-                    </option>
-
-                    <option>
-                      4–6 LPA
-                    </option>
-
-                    <option>
-                      6–10 LPA
-                    </option>
-
-                    <option>
-                      10+ LPA
-                    </option>
-
-                  </select>
-
-                </div>
-
-              </div>
-
-              <div className="mt-8">
-
-                <label className="block font-medium mb-3">
-                  Preferred Locations
-                </label>
-
-                <div className="flex flex-wrap gap-3">
-
-                  {locationOptions.map(
-                    (location) => (
-                      <button
-                        key={location}
-                        type="button"
-                        onClick={() => {
-
-                          if (
-                            profile.locations.includes(
-                              location
-                            )
-                          ) {
-
-                            setProfile({
-                              ...profile,
-                              locations:
-                                profile.locations.filter(
-                                  (l) =>
-                                    l !==
-                                    location
-                                ),
-                            });
-
-                          } else {
-
-                            setProfile({
-                              ...profile,
-                              locations: [
-                                ...profile.locations,
-                                location,
-                              ],
-                            });
-
-                          }
-
-                        }}
-                        className={`px-4 py-2 rounded-full border transition ${
-                          profile.locations.includes(
-                            location
-                          )
-                            ? "bg-[#FF9900] text-white border-[#FF9900]"
-                            : "bg-white"
-                        }`}
-                      >
-                        {location}
-                      </button>
-                    )
-                  )}
-
-                </div>
-
-              </div>
-
-              <div className="mt-8">
-
-                <label className="block font-medium mb-2">
-                  Skills
-                </label>
-
-                <textarea
-                  rows={5}
-                  value={profile.skills.join(
-                    ", "
-                  )}
-                  onChange={(e) =>
-                    setProfile({
-                      ...profile,
-                      skills:
-                        e.target.value
-                          .split(",")
-                          .map((s) =>
-                            s.trim()
-                          )
-                          .filter(Boolean),
-                    })
-                  }
-                  className="w-full border rounded-lg p-3"
-                  placeholder="React, Next.js, Java..."
-                />
-
-              </div>
-
-            </div>
-
-            <hr />
-                        {/* Resume */}
-
-            <div>
-
-              <h2 className="text-2xl font-bold mb-6">
-                Resume
-              </h2>
-
-              <div className="border rounded-xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-
-                <div>
-
-                  <h3 className="font-semibold text-lg">
-                    Resume Status
-                  </h3>
-
-                  <p className="text-gray-500 mt-2">
-
-                    {profile.resumeUrl
-                      ? "Your resume has been uploaded successfully."
-                      : "No resume uploaded yet."}
-
-                  </p>
-
-                </div>
-
-                <Link
-                  href="/dashboard/resume"
-                  className="bg-[#FF9900] px-6 py-3 rounded-lg font-semibold text-center"
-                >
-                  {profile.resumeUrl
-                    ? "Update Resume"
-                    : "Upload Resume"}
-                </Link>
-
-              </div>
-
-            </div>
-
-            <hr />
-
-            {/* Profile Completion */}
-
-            <div>
-
-              <h2 className="text-2xl font-bold mb-5">
-                Profile Strength
-              </h2>
-
-              <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
-
-                <div
-                  className="bg-[#FF9900] h-full transition-all"
-                  style={{
-                    width: `${profileScore}%`,
-                  }}
-                />
-
-              </div>
-
-              <div className="mt-3 flex justify-between">
-
-                <p className="text-gray-500">
-
-                  Your profile is
-
-                  <span className="font-semibold text-black">
-                    {" "}
-                    {profileScore}% complete
-                  </span>
-
-                </p>
-
-                {profileScore === 100 ? (
-                  <span className="text-green-600 font-semibold">
-                    Complete
-                  </span>
-                ) : (
-                  <span className="text-orange-600 font-semibold">
-                    Improve Profile
-                  </span>
-                )}
-
-              </div>
-
-              <div className="mt-8 bg-[#FFF8E7] rounded-xl border border-[#FFE0A3] p-5">
-
-                <h3 className="font-bold mb-3">
-                  Tips to reach 100%
-                </h3>
-
-                <ul className="list-disc ml-5 space-y-2 text-gray-700">
-
-                  {!profile.resumeUrl && (
-                    <li>
-                      Upload your latest
-                      resume.
-                    </li>
-                  )}
-
-                  {!profile.skills.length && (
-                    <li>
-                      Add your technical
-                      skills.
-                    </li>
-                  )}
-
-                  {!profile.locations.length && (
-                    <li>
-                      Select preferred job
-                      locations.
-                    </li>
-                  )}
-
-                  {!profile.salary && (
-                    <li>
-                      Select expected salary.
-                    </li>
-                  )}
-
-                  {!profile.jobType && (
-                    <li>
-                      Choose preferred job
-                      type.
-                    </li>
-                  )}
-
-                  {!profile.cgpa && (
-                    <li>
-                      Add your CGPA.
-                    </li>
-                  )}
-
-                  {!profile.branch && (
-                    <li>
-                      Add your branch.
-                    </li>
-                  )}
-
-                </ul>
-
-              </div>
-
-            </div>
-
-            <div className="flex justify-end gap-4 pt-6">
-
-              <Link
-                href="/dashboard"
-                className="border px-6 py-3 rounded-lg font-semibold hover:bg-gray-100"
-              >
-                Cancel
-              </Link>
-
-              <button
-                type="submit"
-                disabled={saving}
-                className="bg-[#FF9900] px-8 py-3 rounded-lg font-semibold disabled:opacity-60"
-              >
-                {saving
-                  ? "Saving..."
-                  : "Save Changes"}
-              </button>
-
-            </div>
-
-          </form>
-
-        </div>
-
-      </div>
-
+  const inputClass = "w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#FF9900] focus:ring-2 focus:ring-[#FF9900]/10 transition bg-white";
+  const labelClass = "block text-sm font-semibold text-gray-700 mb-1.5";
+  const sectionClass = "bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-5";
+
+  if (loading) return (
+    <div className="min-h-screen bg-gray-50"><Navbar />
+      <div className="flex items-center justify-center h-64"><Loader2 className="animate-spin text-[#FF9900]" size={28} /></div>
     </div>
-
   );
 
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+        <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 mb-6 transition">
+          <ArrowLeft size={16} /> Back to Dashboard
+        </Link>
+
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Edit Profile</h1>
+            <p className="text-sm text-gray-500 mt-1">Keep your information up to date for better job matches.</p>
+          </div>
+          <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-5 py-3 shadow-sm">
+            <div className="text-right">
+              <p className="text-xs text-gray-500">Profile Completion</p>
+              <p className="text-2xl font-bold text-[#FF9900]">{profileScore}%</p>
+            </div>
+            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+              <svg className="w-10 h-10 -rotate-90" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f3f4f6" strokeWidth="3" />
+                <circle cx="18" cy="18" r="15.9" fill="none" stroke="#FF9900" strokeWidth="3"
+                  strokeDasharray={`${profileScore} ${100 - profileScore}`} strokeLinecap="round" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <form onSubmit={save} className="space-y-6">
+          {/* Personal */}
+          <div className={sectionClass}>
+            <h2 className="text-base font-bold text-gray-900 border-b border-gray-100 pb-3">Personal Information</h2>
+            <div className="grid sm:grid-cols-2 gap-5">
+              {[["firstName","First Name"], ["lastName","Last Name"], ["city","Current City"]].map(([k, l]) => (
+                <div key={k}>
+                  <label className={labelClass}>{l}</label>
+                  <input value={(profile as any)[k]} onChange={e => set(k as any, e.target.value)} className={inputClass} />
+                </div>
+              ))}
+              <div>
+                <label className={labelClass}>Experience</label>
+                <select value={profile.experience} onChange={e => set("experience", e.target.value)} className={inputClass}>
+                  {EXP_OPTIONS.map(o => <option key={o}>{o}</option>)}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Education */}
+          <div className={sectionClass}>
+            <h2 className="text-base font-bold text-gray-900 border-b border-gray-100 pb-3">Education</h2>
+            <div className="grid sm:grid-cols-2 gap-5">
+              <div>
+                <label className={labelClass}>Degree</label>
+                <select value={profile.degree} onChange={e => set("degree", e.target.value)} className={inputClass}>
+                  <option value="">Select Degree</option>
+                  {DEGREE_OPTIONS.map(o => <option key={o}>{o}</option>)}
+                </select>
+              </div>
+              {[["branch","Branch / Stream"], ["college","College / University"], ["cgpa","CGPA"]].map(([k, l]) => (
+                <div key={k}>
+                  <label className={labelClass}>{l}</label>
+                  <input value={(profile as any)[k]} onChange={e => set(k as any, e.target.value)} className={inputClass} />
+                </div>
+              ))}
+              <div>
+                <label className={labelClass}>Graduation Year</label>
+                <select value={profile.gradYear} onChange={e => set("gradYear", e.target.value)} className={inputClass}>
+                  <option value="">Select Year</option>
+                  {Array.from({ length: 10 }, (_, i) => 2024 + i).map(y => <option key={y}>{y}</option>)}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Preferences */}
+          <div className={sectionClass}>
+            <h2 className="text-base font-bold text-gray-900 border-b border-gray-100 pb-3">Job Preferences</h2>
+            <div className="grid sm:grid-cols-2 gap-5">
+              <div>
+                <label className={labelClass}>Preferred Job Type</label>
+                <select value={profile.jobType} onChange={e => set("jobType", e.target.value)} className={inputClass}>
+                  <option value="">Select</option>
+                  {JOB_TYPE_OPTIONS.map(o => <option key={o}>{o}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className={labelClass}>Expected Salary</label>
+                <select value={profile.salary} onChange={e => set("salary", e.target.value)} className={inputClass}>
+                  <option value="">Select</option>
+                  {SALARY_OPTIONS.map(o => <option key={o}>{o}</option>)}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className={labelClass}>Preferred Locations</label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {LOCATION_OPTIONS.map(loc => {
+                  const active = profile.locations.includes(loc);
+                  return (
+                    <button key={loc} type="button"
+                      onClick={() => set("locations", active ? profile.locations.filter(l => l !== loc) : [...profile.locations, loc])}
+                      className={`px-3.5 py-2 rounded-xl text-xs font-semibold border transition ${active ? "bg-[#232F3E] text-white border-[#232F3E]" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"}`}>
+                      {loc}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <label className={labelClass}>Skills <span className="text-gray-400 font-normal">(comma separated)</span></label>
+              <textarea rows={3} value={profile.skills.join(", ")}
+                onChange={e => set("skills", e.target.value.split(",").map(s => s.trim()).filter(Boolean))}
+                className={`${inputClass} resize-none`} placeholder="React, Node.js, Python, SQL..." />
+            </div>
+          </div>
+
+          {/* Resume */}
+          <div className={sectionClass}>
+            <h2 className="text-base font-bold text-gray-900 border-b border-gray-100 pb-3">Resume</h2>
+            <div className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-gray-50">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${profile.resumeUrl ? "bg-emerald-100" : "bg-gray-200"}`}>
+                  <CheckCircle size={18} className={profile.resumeUrl ? "text-emerald-600" : "text-gray-400"} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">{profile.resumeUrl ? "Resume uploaded" : "No resume yet"}</p>
+                  <p className="text-xs text-gray-500">{profile.resumeUrl ? "Active and visible to recruiters" : "Upload to start applying"}</p>
+                </div>
+              </div>
+              <Link href="/dashboard/resume" className="text-xs font-semibold text-[#FF9900] hover:underline">
+                {profile.resumeUrl ? "Update →" : "Upload →"}
+              </Link>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3 justify-end">
+            <Link href="/dashboard" className="px-6 py-3 border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition">
+              Cancel
+            </Link>
+            <button type="submit" disabled={saving}
+              className="inline-flex items-center gap-2 bg-[#FF9900] text-gray-900 font-bold px-8 py-3 rounded-xl text-sm hover:bg-[#e88d00] disabled:opacity-60 transition shadow-sm">
+              {saving ? <><Loader2 size={15} className="animate-spin" /> Saving...</> : <><Save size={15} /> Save Changes</>}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 }
