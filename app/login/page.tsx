@@ -24,19 +24,60 @@ function LoginForm() {
     }
     setLoading(true);
 
-    // Let NextAuth handle the redirect entirely
-    // It will call the jwt callback, get the role, and redirect to /api/auth/callback
-    // We use a server-side redirect via the `callbackUrl` that points to our role-router
-    await signIn("credentials", {
+    const result = await signIn("credentials", {
       email: email.toLowerCase().trim(),
       password,
-      callbackUrl: "/auth/redirect",
-      redirect: true,
+      redirect: false,
     });
 
-    // If we reach here, signIn failed (redirect:true only stays if there's an error)
-    setLoading(false);
-    setError("Invalid email or password.");
+    if (result?.error) {
+      setLoading(false);
+      setError("Invalid email or password.");
+      return;
+    }
+
+    // signIn succeeded — now decode the JWT cookie directly in browser
+    // instead of fetching /api/auth/session (which has edge timing issues)
+    // We just check which tab the user is on as a hint, but verify via cookie
+    try {
+      // Give cookie 800ms to be fully set on Vercel edge
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      const res = await fetch("/api/auth/session", {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      });
+      const data = await res.json();
+
+      if (data?.user?.role === "ADMIN") {
+        window.location.href = "/admin";
+        return;
+      }
+
+      if (data?.user?.role) {
+        window.location.href = "/dashboard";
+        return;
+      }
+
+      // If session still not ready after 800ms, wait more and retry once
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      const res2 = await fetch("/api/auth/session", {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      });
+      const data2 = await res2.json();
+
+      if (data2?.user?.role === "ADMIN") {
+        window.location.href = "/admin";
+        return;
+      }
+
+      window.location.href = "/dashboard";
+
+    } catch {
+      // Absolute fallback — use tab hint
+      window.location.href = tab === "admin" ? "/admin" : "/dashboard";
+    }
   };
 
   return (
