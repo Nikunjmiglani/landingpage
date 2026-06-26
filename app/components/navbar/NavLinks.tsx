@@ -66,12 +66,7 @@ export default function NavLinks({ role }: Props) {
           Dashboard
         </Link>
 
-        <Link
-          href="/dashboard/applications"
-          className={linkClass}
-        >
-          Applications
-        </Link>
+        
 
         <Link
           href="/dashboard/resume"
@@ -127,12 +122,7 @@ export default function NavLinks({ role }: Props) {
         Skill Courses
       </Link>
 
-      <Link
-        href="/internships"
-        className={linkClass}
-      >
-        Internships
-      </Link>
+     
     </>
   );
 }
