@@ -3,13 +3,13 @@
 import Footer from "./components/Footer";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
+import { useSession } from "next-auth/react";
 import {
   Star, Users, Briefcase, TrendingUp, Award,
   BookOpen, ArrowRight, ChevronLeft, ChevronRight,
   CheckCircle, Clock, Shield, Target, Zap, HeartHandshake
 } from "lucide-react";
 
-// ── Realistic numbers for a growing agency ──
 const stats = [
   { label: "Candidates Placed", rawValue: 840, suffix: "+", decimals: 0, icon: Users },
   { label: "Hiring Partners", rawValue: 45, suffix: "+", decimals: 0, icon: Briefcase },
@@ -138,6 +138,12 @@ function CourseCard({ course }: { course: Course }) {
 }
 
 export default function HomePage() {
+  const { data: session } = useSession();
+  const role = (session?.user as any)?.role;
+  const isLoggedIn = !!session;
+  const isAdmin = role === "ADMIN";
+  const isCandidate = role === "CANDIDATE";
+
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   const [perPage, setPerPage] = useState(3);
   const [courses, setCourses] = useState<Course[]>([]);
@@ -165,20 +171,42 @@ export default function HomePage() {
   const next = () => setTestimonialIndex(i => (i + perPage >= testimonials.length ? 0 : i + perPage));
   const prev = () => setTestimonialIndex(i => (i - perPage < 0 ? Math.max(0, testimonials.length - perPage) : i - perPage));
 
+  // Dynamic CTA targets based on auth state
+  const primaryCTA = isAdmin
+    ? { href: "/admin", label: "Go to Admin Panel" }
+    : isCandidate
+    ? { href: "/jobs", label: "Browse Open Jobs" }
+    : { href: "/onboarding", label: "Get Started — It's Free" };
+
+  const secondaryCTA = isAdmin
+    ? { href: "/admin/courses", label: "Manage Courses" }
+    : isCandidate
+    ? { href: "/dashboard", label: "My Dashboard" }
+    : { href: "/jobs", label: "Browse Open Jobs" };
+
+  const placementCTA = isAdmin
+    ? { href: "/admin", label: "Go to Admin Panel" }
+    : isCandidate
+    ? { href: "/dashboard/profile", label: "Complete My Profile" }
+    : { href: "/onboarding", label: "Start Your Placement Journey" };
+
+  const bottomPrimaryCTA = isAdmin
+    ? { href: "/admin", label: "Admin Dashboard" }
+    : isCandidate
+    ? { href: "/dashboard", label: "Go to My Dashboard" }
+    : { href: "/onboarding", label: "Create Free Account" };
+
   return (
     <div className="min-h-screen bg-white">
-      
 
       {/* ── Hero ── */}
       <section className="relative bg-gradient-to-br from-[#1a2332] via-[#232F3E] to-[#2d3f52] text-white overflow-hidden">
-        {/* dot grid */}
         <div className="absolute inset-0 opacity-[0.04]"
           style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "28px 28px" }} />
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20 lg:py-28">
           <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
 
-            {/* Text */}
             <div className="flex-1 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 bg-[#FF9900]/15 border border-[#FF9900]/25 text-[#FF9900] text-xs font-semibold px-4 py-1.5 rounded-full mb-5 uppercase tracking-wider">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#FF9900] animate-pulse" />
@@ -190,35 +218,43 @@ export default function HomePage() {
                 <span className="text-[#FF9900]">With Confidence.</span>
               </h1>
 
-              <p className="text-gray-300 text-base sm:text-lg mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                HireVexa helps freshers bridge the gap between campus and career —
-                with personalised counselling, resume building, and direct placement support.
-              </p>
+              {isLoggedIn ? (
+                <p className="text-gray-300 text-base sm:text-lg mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                  Welcome back{session?.user?.name ? `, ${session.user.name.split(" ")[0]}` : ""}! 
+                  {isAdmin ? " Manage your platform from the admin panel." : " Continue your placement journey from where you left off."}
+                </p>
+              ) : (
+                <p className="text-gray-300 text-base sm:text-lg mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                  HireVexa helps freshers bridge the gap between campus and career —
+                  with personalised counselling, resume building, and direct placement support.
+                </p>
+              )}
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
-                <Link href="/onboarding"
+                <Link href={primaryCTA.href}
                   className="inline-flex items-center justify-center gap-2 bg-[#FF9900] hover:bg-[#e88d00] text-gray-900 font-bold px-7 py-3.5 rounded-xl text-sm transition-all shadow-lg shadow-orange-500/20 hover:scale-[1.02] active:scale-[0.99]">
-                  Get Started — It's Free <ArrowRight size={16} />
+                  {primaryCTA.label} <ArrowRight size={16} />
                 </Link>
-                <Link href="/jobs"
+                <Link href={secondaryCTA.href}
                   className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold px-7 py-3.5 rounded-xl text-sm transition-all">
-                  Browse Open Jobs
+                  {secondaryCTA.label}
                 </Link>
               </div>
 
-              <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 justify-center lg:justify-start text-xs text-gray-400">
-                {["Free registration", "No placement fees", "Dedicated counsellor"].map(t => (
-                  <span key={t} className="flex items-center gap-1.5">
-                    <CheckCircle size={12} className="text-[#FF9900]" /> {t}
-                  </span>
-                ))}
-              </div>
+              {!isLoggedIn && (
+                <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 justify-center lg:justify-start text-xs text-gray-400">
+                  {["Free registration", "No placement fees", "Dedicated counsellor"].map(t => (
+                    <span key={t} className="flex items-center gap-1.5">
+                      <CheckCircle size={12} className="text-[#FF9900]" /> {t}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Visual — stats card stack */}
+            {/* Stats card */}
             <div className="flex-shrink-0 w-full max-w-xs lg:max-w-sm">
               <div className="relative">
-                {/* Main card */}
                 <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 text-center">
                   <div className="w-16 h-16 rounded-2xl bg-[#FF9900] flex items-center justify-center mx-auto mb-4 shadow-lg shadow-orange-500/30">
                     <img src="/logo.png" alt="HireVexa" className="w-10 h-10 object-contain" />
@@ -239,7 +275,6 @@ export default function HomePage() {
                     ))}
                   </div>
                 </div>
-                {/* Floating badge */}
                 <div className="absolute -bottom-4 -right-4 bg-emerald-500 text-white text-xs font-bold px-3 py-2 rounded-xl shadow-lg flex items-center gap-1.5">
                   <CheckCircle size={13} /> Placements Active
                 </div>
@@ -254,7 +289,10 @@ export default function HomePage() {
             <span>📍 Serving <strong className="text-white">Pan India</strong></span>
             <span className="hidden sm:inline">📞 <strong className="text-white">Free counselling</strong> sessions available</span>
             <span>🤝 <strong className="text-white">45+ hiring partners</strong> onboard</span>
-            <Link href="/onboarding" className="text-[#FF9900] hover:underline font-semibold">Register Now →</Link>
+            {isLoggedIn
+              ? <Link href={isAdmin ? "/admin" : "/dashboard"} className="text-[#FF9900] hover:underline font-semibold">Go to Dashboard →</Link>
+              : <Link href="/onboarding" className="text-[#FF9900] hover:underline font-semibold">Register Now →</Link>
+            }
           </div>
         </div>
       </section>
@@ -277,7 +315,7 @@ export default function HomePage() {
             <p className="text-xs font-semibold uppercase tracking-widest text-[#FF9900] mb-2">Why Choose Us</p>
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Built Different. For Freshers.</h2>
             <p className="text-gray-500 text-sm mt-3 max-w-xl mx-auto">
-              We're not a job board. We're a placement partner — with real humans who care about your career.
+              We&apos;re not a job board. We&apos;re a placement partner — with real humans who care about your career.
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -293,39 +331,39 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
       {/* ── Director Message ── */}
-<section className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-16">
-  <div className="bg-gradient-to-br from-[#1a2332] to-[#232F3E] rounded-3xl p-8 sm:p-12 text-white relative overflow-hidden">
-    <div className="absolute inset-0 opacity-[0.04]"
-      style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "24px 24px" }} />
-    <div className="relative max-w-3xl">
-      <div className="inline-block bg-[#FF9900]/15 border border-[#FF9900]/30 text-[#FF9900] text-xs font-bold px-4 py-1.5 rounded-full mb-6 uppercase tracking-wider">
-        Message From Director
-      </div>
-      <div className="text-4xl text-[#FF9900]/30 font-serif leading-none mb-4">&ldquo;</div>
-      <p className="text-gray-200 text-base sm:text-lg leading-relaxed mb-4">
-        At HireVexa, our vision has always been simple — bridge the gap between education and employment.
-        Every year thousands of talented graduates struggle not because they lack potential, but because
-        they lack guidance, opportunities, and industry exposure.
-      </p>
-      <p className="text-gray-400 text-sm sm:text-base leading-relaxed mb-8">
-        Our mission is to ensure that every student receives the right career direction, professional
-        training, and placement opportunities required to succeed in today&apos;s competitive job market.
-        I sincerely thank our students, recruiters, mentors, and industry partners for placing their
-        trust in us.
-      </p>
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-[#FF9900] flex items-center justify-center text-gray-900 font-bold text-lg flex-shrink-0">
-          S
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-16">
+        <div className="bg-gradient-to-br from-[#1a2332] to-[#232F3E] rounded-3xl p-8 sm:p-12 text-white relative overflow-hidden">
+          <div className="absolute inset-0 opacity-[0.04]"
+            style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "24px 24px" }} />
+          <div className="relative max-w-3xl">
+            <div className="inline-block bg-[#FF9900]/15 border border-[#FF9900]/30 text-[#FF9900] text-xs font-bold px-4 py-1.5 rounded-full mb-6 uppercase tracking-wider">
+              Message From Director
+            </div>
+            <div className="text-4xl text-[#FF9900]/30 font-serif leading-none mb-4">&ldquo;</div>
+            <p className="text-gray-200 text-base sm:text-lg leading-relaxed mb-4">
+              At HireVexa, our vision has always been simple — bridge the gap between education and employment.
+              Every year thousands of talented graduates struggle not because they lack potential, but because
+              they lack guidance, opportunities, and industry exposure.
+            </p>
+            <p className="text-gray-400 text-sm sm:text-base leading-relaxed mb-8">
+              Our mission is to ensure that every student receives the right career direction, professional
+              training, and placement opportunities required to succeed in today&apos;s competitive job market.
+              I sincerely thank our students, recruiters, mentors, and industry partners for placing their trust in us.
+            </p>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-[#FF9900] flex items-center justify-center text-gray-900 font-bold text-lg flex-shrink-0">
+                S
+              </div>
+              <div>
+                <p className="font-bold text-white text-base">Mr. Siddharth Vats</p>
+                <p className="text-[#FF9900] text-sm font-medium">Director & Founder, HireVexa Consultancy</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div>
-          <p className="font-bold text-white text-base">Mr. Siddharth Vats</p>
-          <p className="text-[#FF9900] text-sm font-medium">Director & Founder, HireVexa Consultancy</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+      </section>
 
       {/* ── How it works ── */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-16">
@@ -334,7 +372,6 @@ export default function HomePage() {
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">How HireVexa Works</h2>
         </div>
         <div className="relative">
-          {/* Connector line desktop */}
           <div className="hidden lg:block absolute top-10 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-transparent via-orange-200 to-transparent" />
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {[
@@ -359,14 +396,14 @@ export default function HomePage() {
           </div>
         </div>
         <div className="mt-12 text-center">
-          <Link href="/onboarding"
+          <Link href={placementCTA.href}
             className="inline-flex items-center gap-2 bg-[#232F3E] hover:bg-[#1a2332] text-white font-bold px-8 py-3.5 rounded-xl text-sm transition shadow-sm">
-            Start Your Placement Journey <ArrowRight size={16} />
+            {placementCTA.label} <ArrowRight size={16} />
           </Link>
         </div>
       </section>
 
-       {/* ── Featured Courses ── */}
+      {/* ── Featured Courses ── */}
       {courses.length > 0 && (
         <section className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-16">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
@@ -375,8 +412,7 @@ export default function HomePage() {
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Featured Courses</h2>
               <p className="text-gray-500 text-sm mt-2">Learn in-demand skills and boost your placement chances.</p>
             </div>
-            <Link href="/courses"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#FF9900] hover:underline flex-shrink-0">
+            <Link href="/courses" className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#FF9900] hover:underline flex-shrink-0">
               View all courses <ArrowRight size={14} />
             </Link>
           </div>
@@ -393,7 +429,6 @@ export default function HomePage() {
           <h2 className="text-2xl font-bold text-gray-900">Companies We Work With</h2>
         </div>
         <div className="relative overflow-hidden">
-          {/* fade edges */}
           <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-gray-50 to-transparent z-10 pointer-events-none" />
           <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-gray-50 to-transparent z-10 pointer-events-none" />
           <div className="flex gap-5 animate-marquee w-max">
@@ -406,8 +441,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-     
 
       {/* ── Testimonials ── */}
       <section className={`py-14 sm:py-16 ${courses.length > 0 ? "bg-gray-50 border-y border-gray-100" : ""}`}>
@@ -429,7 +462,6 @@ export default function HomePage() {
               </button>
             </div>
           </div>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {visible.map(t => (
               <div key={t.name} className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col">
@@ -465,22 +497,29 @@ export default function HomePage() {
           <div className="absolute inset-0 opacity-[0.04]"
             style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "24px 24px" }} />
           <div className="relative px-6 sm:px-12 py-12 sm:py-16 text-center">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3">Ready to Start Your Career?</h2>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3">
+              {isLoggedIn ? "Continue Your Journey" : "Ready to Start Your Career?"}
+            </h2>
             <p className="text-gray-300 mb-8 text-sm sm:text-base max-w-xl mx-auto">
-              Join hundreds of freshers who trusted HireVexa to land their first role.
-              Free to register. No strings attached.
+              {isAdmin
+                ? "Manage jobs, candidates, courses and track placements from your admin panel."
+                : isCandidate
+                ? "Check your applications, update your profile, and browse the latest job openings."
+                : "Join hundreds of freshers who trusted HireVexa to land their first role. Free to register. No strings attached."}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/onboarding"
+              <Link href={bottomPrimaryCTA.href}
                 className="inline-flex items-center justify-center gap-2 bg-[#FF9900] hover:bg-[#e88d00] text-gray-900 font-bold px-8 sm:px-10 py-4 rounded-xl text-sm transition-all shadow-lg shadow-orange-500/20 hover:scale-[1.02]">
-                Create Free Account <ArrowRight size={16} />
+                {bottomPrimaryCTA.label} <ArrowRight size={16} />
               </Link>
               <Link href="/courses"
                 className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold px-8 sm:px-10 py-4 rounded-xl text-sm transition-all">
                 <BookOpen size={15} /> Browse Courses
               </Link>
             </div>
-            <p className="mt-5 text-gray-500 text-xs">No credit card required · Free registration · Placement support included</p>
+            {!isLoggedIn && (
+              <p className="mt-5 text-gray-500 text-xs">No credit card required · Free registration · Placement support included</p>
+            )}
           </div>
         </div>
       </section>
