@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import Navbar from "../../components/Navbar";
+
 import { ArrowLeft, Save, Loader2, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 
@@ -58,14 +58,14 @@ export default function ProfilePage() {
   const sectionClass = "bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-5";
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-50"><Navbar />
+    <div className="min-h-screen bg-gray-50">
       <div className="flex items-center justify-center h-64"><Loader2 className="animate-spin text-[#FF9900]" size={28} /></div>
     </div>
   );
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
         <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 mb-6 transition">
           <ArrowLeft size={16} /> Back to Dashboard

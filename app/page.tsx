@@ -1,5 +1,5 @@
 "use client";
-import Navbar from "./components/Navbar";
+
 import Footer from "./components/Footer";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
@@ -167,7 +167,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
+      
 
       {/* ── Hero ── */}
       <section className="relative bg-gradient-to-br from-[#1a2332] via-[#232F3E] to-[#2d3f52] text-white overflow-hidden">

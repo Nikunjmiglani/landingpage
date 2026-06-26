@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Navbar from "../components/Navbar";
+
 import {
   CheckCircle, Clock, AlertCircle, Briefcase, FileText,
   Calendar, TrendingUp, ChevronRight, User, Loader2,
@@ -66,7 +66,7 @@ export default function DashboardPage() {
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navbar />
+        
         <div className="flex items-center justify-center h-64"><Loader2 className="animate-spin text-[#FF9900]" size={32} /></div>
       </div>
     );
@@ -76,7 +76,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+     
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
 
         {/* Profile card */}

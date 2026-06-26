@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import Navbar from "../components/Navbar";
+
 import { Briefcase, Building2, MapPin, Clock, Search, SlidersHorizontal, ChevronRight, Loader2 } from "lucide-react";
 
 type Job = {
@@ -50,7 +50,7 @@ export default function JobsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      
       <div className="bg-gradient-to-br from-[#232F3E] to-[#1a2332] text-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
           <p className="text-[#FF9900] text-xs font-semibold uppercase tracking-widest mb-3">Latest Openings</p>

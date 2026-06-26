@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import Navbar from "@/app/components/Navbar";
+
 import ApplyButton from "./ApplyButton";
 import {
   MapPin, Briefcase, DollarSign, Users, Clock,
@@ -49,7 +49,7 @@ export default async function JobDetailsPage({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      
 
       {/* Hero */}
       <div className="bg-gradient-to-br from-[#232F3E] to-[#1a2332] text-white">

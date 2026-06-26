@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import Navbar from "../components/Navbar";
+
 import { BookOpen, Search, Users, Clock, Star, Filter, Loader2, ChevronRight } from "lucide-react";
 
 interface Course {
@@ -49,7 +49,7 @@ export default function CoursesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      
 
       {/* Hero */}
       <div className="bg-gradient-to-br from-[#232F3E] to-[#1a2332] text-white">

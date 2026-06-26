@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import Navbar from "@/app/components/Navbar";
+
 import {
   BookOpen, Clock, Users, Star, ChevronDown, ChevronRight,
   Play, Lock, CheckCircle, ArrowLeft, Globe, BarChart2, Loader2
@@ -78,7 +78,7 @@ export default function CourseDetailPage() {
   const effectivePrice = course ? course.price - (course.price * course.discount) / 100 : 0;
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-50"><Navbar />
+    <div className="min-h-screen bg-gray-50">
       <div className="flex items-center justify-center h-64"><Loader2 className="animate-spin text-[#FF9900]" size={32} /></div>
     </div>
   );
@@ -86,7 +86,7 @@ export default function CourseDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      
 
       {/* Hero */}
       <div className="bg-gradient-to-br from-[#1a2332] to-[#232F3E] text-white">

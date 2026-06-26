@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Navbar from "../components/Navbar";
+
 import Footer from "../components/Footer";
 import {
   FileText, Search, CheckCircle, XCircle, Award,
@@ -34,7 +34,7 @@ const steps = [
 export default function ResumeBuildingPage() {
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
+   
 
       {/* Hero */}
       <section className="bg-gradient-to-br from-[#1a2332] via-[#232F3E] to-[#2d3f52] text-white overflow-hidden relative">

@@ -1,4 +1,4 @@
-import Navbar from "../components/Navbar";
+
 import Footer from "../components/Footer";
 import Link from "next/link";
 import {
@@ -50,7 +50,7 @@ const faqs = [
 export default function InterviewPrepPage() {
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
+      
 
       {/* Hero */}
       <section className="bg-gradient-to-br from-[#1a2332] via-[#232F3E] to-[#2d3f52] text-white">
