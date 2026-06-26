@@ -220,7 +220,7 @@ export default function HomePage() {
 
               {isLoggedIn ? (
                 <p className="text-gray-300 text-base sm:text-lg mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                  Welcome back{session?.user?.name ? `, ${session.user.name.split(" ")[0]}` : ""}! 
+                  Welcome back{(session?.user as any)?.name ? `, ${((session?.user as any)?.name as string).split(" ")[0]}` : ""}!
                   {isAdmin ? " Manage your platform from the admin panel." : " Continue your placement journey from where you left off."}
                 </p>
               ) : (
