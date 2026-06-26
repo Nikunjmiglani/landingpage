@@ -1,14 +1,13 @@
 "use client";
-import { useEffect, useState, Suspense } from "react";
-import { signIn, useSession } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, Suspense } from "react";
+import { signIn } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, ChevronRight, Loader2, AlertCircle, CheckCircle } from "lucide-react";
 
 function LoginForm() {
   const searchParams = useSearchParams();
   const registered = searchParams.get("registered");
-  const { data: session, status } = useSession();
 
   const [showPass, setShowPass] = useState(false);
   const [tab, setTab] = useState<"candidate" | "admin">("candidate");
@@ -16,17 +15,6 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  // If already authenticated on load, redirect
-  useEffect(() => {
-    if (status !== "authenticated" || !session?.user) return;
-    const role = (session.user as any).role;
-    if (role === "ADMIN") {
-      window.location.replace("/admin");
-    } else {
-      window.location.replace("/dashboard");
-    }
-  }, [session, status]);
 
   const handleLogin = async () => {
     setError("");
@@ -36,85 +24,20 @@ function LoginForm() {
     }
     setLoading(true);
 
-    try {
-      const result = await signIn("credentials", {
-        email: email.toLowerCase().trim(),
-        password,
-        redirect: false,
-      });
+    // Let NextAuth handle the redirect entirely
+    // It will call the jwt callback, get the role, and redirect to /api/auth/callback
+    // We use a server-side redirect via the `callbackUrl` that points to our role-router
+    await signIn("credentials", {
+      email: email.toLowerCase().trim(),
+      password,
+      callbackUrl: "/auth/redirect",
+      redirect: true,
+    });
 
-      if (result?.error) {
-        setLoading(false);
-        setError("Invalid email or password.");
-        return;
-      }
-
-      // Poll for session with retries
-      let attempts = 0;
-      const maxAttempts = 10;
-
-      const pollSession = async () => {
-        attempts++;
-        try {
-          const res = await fetch("/api/auth/session");
-          const data = await res.json();
-
-          if (data?.user?.role) {
-            // Session ready — redirect
-            if (data.user.role === "ADMIN") {
-              window.location.replace("/admin");
-            } else {
-              window.location.replace("/dashboard");
-            }
-            return;
-          }
-        } catch (_) {}
-
-        if (attempts < maxAttempts) {
-          setTimeout(pollSession, 500);
-        } else {
-          // Fallback after all retries
-          setLoading(false);
-          setError("Login succeeded but redirect failed. Please refresh the page.");
-        }
-      };
-
-      // Start polling after a short delay
-      setTimeout(pollSession, 300);
-
-    } catch (_) {
-      setLoading(false);
-      setError("Something went wrong. Please try again.");
-    }
+    // If we reach here, signIn failed (redirect:true only stays if there's an error)
+    setLoading(false);
+    setError("Invalid email or password.");
   };
-
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen bg-[#EAEDED] flex items-center justify-center">
-        <Loader2 className="animate-spin text-[#FF9900]" size={28} />
-      </div>
-    );
-  }
-
-  if (status === "authenticated") {
-    return (
-      <div className="min-h-screen bg-[#EAEDED] flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="animate-spin text-[#FF9900]" size={28} />
-          <p className="text-sm text-[#565959]">Redirecting to your dashboard...</p>
-          <button
-            onClick={() => {
-              const role = (session?.user as any)?.role;
-              window.location.replace(role === "ADMIN" ? "/admin" : "/dashboard");
-            }}
-            className="text-xs text-[#007185] hover:underline mt-2"
-          >
-            Click here if not redirected automatically
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#EAEDED] flex flex-col">
@@ -136,18 +59,12 @@ function LoginForm() {
           )}
 
           <div className="flex mb-4 border border-[#DDD] rounded overflow-hidden">
-            <button
-              onClick={() => setTab("candidate")}
-              className={`flex-1 py-2 text-sm font-semibold transition-colors ${
-                tab === "candidate" ? "bg-[#232F3E] text-white" : "bg-white text-[#565959] hover:bg-[#F0F2F2]"
-              }`}>
+            <button onClick={() => setTab("candidate")}
+              className={`flex-1 py-2 text-sm font-semibold transition-colors ${tab === "candidate" ? "bg-[#232F3E] text-white" : "bg-white text-[#565959] hover:bg-[#F0F2F2]"}`}>
               Candidate Login
             </button>
-            <button
-              onClick={() => setTab("admin")}
-              className={`flex-1 py-2 text-sm font-semibold transition-colors ${
-                tab === "admin" ? "bg-[#232F3E] text-white" : "bg-white text-[#565959] hover:bg-[#F0F2F2]"
-              }`}>
+            <button onClick={() => setTab("admin")}
+              className={`flex-1 py-2 text-sm font-semibold transition-colors ${tab === "admin" ? "bg-[#232F3E] text-white" : "bg-white text-[#565959] hover:bg-[#F0F2F2]"}`}>
               Admin / Staff
             </button>
           </div>
@@ -190,18 +107,14 @@ function LoginForm() {
                     className="w-full border border-[#888] rounded px-3 py-2 text-sm outline-none focus:border-[#007185] focus:ring-1 focus:ring-[#007185] pr-10"
                     placeholder="Enter password"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPass(!showPass)}
+                  <button type="button" onClick={() => setShowPass(!showPass)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-[#565959]">
                     {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
               </div>
 
-              <button
-                onClick={handleLogin}
-                disabled={loading}
+              <button onClick={handleLogin} disabled={loading}
                 className="w-full bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-bold py-2 rounded text-sm border border-[#FCD200] transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
                 {loading
                   ? <><Loader2 size={16} className="animate-spin" /> Signing in...</>
@@ -225,8 +138,7 @@ function LoginForm() {
             </div>
           </div>
 
-          <Link
-            href="/onboarding"
+          <Link href="/onboarding"
             className="flex items-center justify-center gap-1 w-full text-center bg-white border border-[#D5D9D9] hover:bg-[#F0F2F2] text-[#0F1111] font-semibold py-2 rounded text-sm shadow-sm">
             Create your Hirevexa account <ChevronRight size={14} />
           </Link>
