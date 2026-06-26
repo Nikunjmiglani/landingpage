@@ -1,12 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
+import { usePathname, useRouter } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
 import {
   LayoutDashboard, Briefcase, Users, BookOpen, Tag,
   ShoppingBag, BarChart2, Settings, LogOut, Menu, X,
-  ChevronRight, GraduationCap
+  ChevronRight, GraduationCap, Loader2
 } from "lucide-react";
 
 const NAV = [
@@ -25,11 +25,15 @@ const NAV = [
 
 function SidebarLink({ item, onClick }: { item: any; onClick?: () => void }) {
   const pathname = usePathname();
-  const isActive = item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
+  const isActive = item.href === "/admin"
+    ? pathname === "/admin"
+    : pathname.startsWith(item.href);
   return (
     <Link href={item.href} onClick={onClick}
       className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group ${
-        isActive ? "bg-[#FF9900] text-gray-900 shadow-sm" : "text-gray-400 hover:bg-white/5 hover:text-white"
+        isActive
+          ? "bg-[#FF9900] text-gray-900 shadow-sm"
+          : "text-gray-400 hover:bg-white/5 hover:text-white"
       }`}>
       <item.icon size={17} className={isActive ? "text-gray-900" : "text-gray-500 group-hover:text-white"} />
       {item.label}
@@ -39,7 +43,28 @@ function SidebarLink({ item, onClick }: { item: any; onClick?: () => void }) {
 }
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    if (status === "loading") return;
+    if (!session || session.user?.role !== "ADMIN") {
+      router.replace("/dashboard");
+    }
+  }, [session, status, router]);
+
+  // Show spinner while checking session or if not authorized
+  if (status === "loading" || !session || session.user?.role !== "ADMIN") {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="h-7 w-7 animate-spin text-gray-400" />
+      </div>
+    );
+  }
+
+  const adminName = (session.user as any)?.name ?? "Admin";
+  const adminInitial = adminName[0]?.toUpperCase() ?? "A";
 
   const SidebarContent = ({ onClose }: { onClose?: () => void }) => (
     <div className="flex flex-col h-full">
@@ -66,7 +91,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {NAV.map((item, i) =>
           item.divider ? (
             <div key={i} className="pt-4 pb-2 px-3">
-              <p className="text-xs font-semibold uppercase tracking-widest text-gray-600">{item.label}</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-600">
+                {item.label}
+              </p>
             </div>
           ) : (
             <SidebarLink key={item.href} item={item} onClick={onClose} />
@@ -76,10 +103,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Bottom */}
       <div className="px-3 py-4 border-t border-white/10">
-        <Link href="/" className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-400 hover:text-white hover:bg-white/5 transition mb-1">
+        <div className="flex items-center gap-3 px-3 py-2.5 mb-2">
+          <div className="w-7 h-7 rounded-full bg-[#FF9900] flex items-center justify-center text-gray-900 font-bold text-xs flex-shrink-0">
+            {adminInitial}
+          </div>
+          <div className="min-w-0">
+            <p className="text-white text-xs font-semibold truncate">{adminName}</p>
+            <p className="text-gray-500 text-[10px] truncate">{session.user?.email}</p>
+          </div>
+        </div>
+        <Link href="/"
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-400 hover:text-white hover:bg-white/5 transition mb-1">
           <ChevronRight size={15} className="rotate-180" /> Back to Site
         </Link>
-        <button onClick={() => signOut({ callbackUrl: "/login" })}
+        <button
+          onClick={() => signOut({ callbackUrl: "/login" })}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition">
           <LogOut size={15} /> Sign Out
         </button>
@@ -108,7 +146,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="flex-1 lg:ml-60 flex flex-col min-h-screen">
         {/* Top bar */}
         <header className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4 flex items-center justify-between sticky top-0 z-10 shadow-sm">
-          <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition">
             <Menu size={20} />
           </button>
           <div className="flex items-center gap-2">
@@ -118,8 +158,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <span className="font-bold text-gray-900 text-sm lg:hidden">Admin</span>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-xs text-gray-500 hover:text-gray-800 transition hidden sm:inline">← View Site</Link>
-            <div className="w-8 h-8 rounded-full bg-[#232F3E] text-white flex items-center justify-center text-xs font-bold">A</div>
+            <Link href="/" className="text-xs text-gray-500 hover:text-gray-800 transition hidden sm:inline">
+              ← View Site
+            </Link>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500 hidden sm:inline">{adminName}</span>
+              <div className="w-8 h-8 rounded-full bg-[#232F3E] text-white flex items-center justify-center text-xs font-bold">
+                {adminInitial}
+              </div>
+            </div>
           </div>
         </header>
 
