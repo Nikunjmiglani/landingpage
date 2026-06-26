@@ -293,6 +293,39 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      {/* ── Director Message ── */}
+<section className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-16">
+  <div className="bg-gradient-to-br from-[#1a2332] to-[#232F3E] rounded-3xl p-8 sm:p-12 text-white relative overflow-hidden">
+    <div className="absolute inset-0 opacity-[0.04]"
+      style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "24px 24px" }} />
+    <div className="relative max-w-3xl">
+      <div className="inline-block bg-[#FF9900]/15 border border-[#FF9900]/30 text-[#FF9900] text-xs font-bold px-4 py-1.5 rounded-full mb-6 uppercase tracking-wider">
+        Message From Director
+      </div>
+      <div className="text-4xl text-[#FF9900]/30 font-serif leading-none mb-4">&ldquo;</div>
+      <p className="text-gray-200 text-base sm:text-lg leading-relaxed mb-4">
+        At HireVexa, our vision has always been simple — bridge the gap between education and employment.
+        Every year thousands of talented graduates struggle not because they lack potential, but because
+        they lack guidance, opportunities, and industry exposure.
+      </p>
+      <p className="text-gray-400 text-sm sm:text-base leading-relaxed mb-8">
+        Our mission is to ensure that every student receives the right career direction, professional
+        training, and placement opportunities required to succeed in today&apos;s competitive job market.
+        I sincerely thank our students, recruiters, mentors, and industry partners for placing their
+        trust in us.
+      </p>
+      <div className="flex items-center gap-4">
+        <div className="w-12 h-12 rounded-2xl bg-[#FF9900] flex items-center justify-center text-gray-900 font-bold text-lg flex-shrink-0">
+          S
+        </div>
+        <div>
+          <p className="font-bold text-white text-base">Mr. Siddharth Vats</p>
+          <p className="text-[#FF9900] text-sm font-medium">Director & Founder, HireVexa Consultancy</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* ── How it works ── */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-16">
