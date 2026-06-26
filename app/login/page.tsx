@@ -1,6 +1,6 @@
 "use client";
-import { useState, Suspense } from "react";
-import { signIn } from "next-auth/react";
+import { useEffect, useState, Suspense } from "react";
+import { signIn, useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, ChevronRight, Loader2, AlertCircle, CheckCircle } from "lucide-react";
@@ -8,6 +8,7 @@ import { Eye, EyeOff, ChevronRight, Loader2, AlertCircle, CheckCircle } from "lu
 function LoginForm() {
   const searchParams = useSearchParams();
   const registered = searchParams.get("registered");
+  const { data: session, status } = useSession();
 
   const [showPass, setShowPass] = useState(false);
   const [tab, setTab] = useState<"candidate" | "admin">("candidate");
@@ -15,6 +16,17 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    const role = (session?.user as any)?.role;
+    if (role === "ADMIN") {
+      window.location.href = "/admin";
+    } else {
+      window.location.href = "/dashboard";
+    }
+  }, [session, status]);
 
   const handleLogin = async () => {
     setError("");
@@ -36,49 +48,22 @@ function LoginForm() {
       return;
     }
 
-    // signIn succeeded — now decode the JWT cookie directly in browser
-    // instead of fetching /api/auth/session (which has edge timing issues)
-    // We just check which tab the user is on as a hint, but verify via cookie
-    try {
-      // Give cookie 800ms to be fully set on Vercel edge
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      const res = await fetch("/api/auth/session", {
-        cache: "no-store",
-        headers: { "Cache-Control": "no-cache" },
-      });
-      const data = await res.json();
-
-      if (data?.user?.role === "ADMIN") {
-        window.location.href = "/admin";
-        return;
-      }
-
-      if (data?.user?.role) {
-        window.location.href = "/dashboard";
-        return;
-      }
-
-      // If session still not ready after 800ms, wait more and retry once
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      const res2 = await fetch("/api/auth/session", {
-        cache: "no-store",
-        headers: { "Cache-Control": "no-cache" },
-      });
-      const data2 = await res2.json();
-
-      if (data2?.user?.role === "ADMIN") {
-        window.location.href = "/admin";
-        return;
-      }
-
-      window.location.href = "/dashboard";
-
-    } catch {
-      // Absolute fallback — use tab hint
-      window.location.href = tab === "admin" ? "/admin" : "/dashboard";
-    }
+    // Login succeeded — useEffect watching session will fire and redirect
+    // Keep loading spinner on while session loads
   };
+
+  if (status === "loading" || (status === "authenticated")) {
+    return (
+      <div className="min-h-screen bg-[#EAEDED] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="animate-spin text-[#FF9900]" size={32} />
+          <p className="text-sm text-[#565959]">
+            {status === "authenticated" ? "Redirecting..." : "Loading..."}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#EAEDED] flex flex-col">
