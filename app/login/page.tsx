@@ -6,21 +6,9 @@ import Link from "next/link";
 import { Eye, EyeOff, ChevronRight, Loader2, AlertCircle, CheckCircle } from "lucide-react";
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const registered = searchParams.get("registered");
-  const callbackUrl = searchParams.get("callbackUrl");
   const { data: session, status } = useSession();
-
-  // If already logged in on page load, redirect immediately
-  useEffect(() => {
-    if (status !== "authenticated") return;
-    if (session?.user?.role === "ADMIN") {
-      window.location.href = callbackUrl?.startsWith("/admin") ? callbackUrl : "/admin";
-    } else {
-      window.location.href = callbackUrl?.startsWith("/dashboard") ? callbackUrl : "/dashboard";
-    }
-  }, [session, status, callbackUrl]);
 
   const [showPass, setShowPass] = useState(false);
   const [tab, setTab] = useState<"candidate" | "admin">("candidate");
@@ -28,6 +16,77 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // If already authenticated on load, redirect
+  useEffect(() => {
+    if (status !== "authenticated" || !session?.user) return;
+    const role = (session.user as any).role;
+    if (role === "ADMIN") {
+      window.location.replace("/admin");
+    } else {
+      window.location.replace("/dashboard");
+    }
+  }, [session, status]);
+
+  const handleLogin = async () => {
+    setError("");
+    if (!email || !password) {
+      setError("Please enter your email and password.");
+      return;
+    }
+    setLoading(true);
+
+    try {
+      const result = await signIn("credentials", {
+        email: email.toLowerCase().trim(),
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setLoading(false);
+        setError("Invalid email or password.");
+        return;
+      }
+
+      // Poll for session with retries
+      let attempts = 0;
+      const maxAttempts = 10;
+
+      const pollSession = async () => {
+        attempts++;
+        try {
+          const res = await fetch("/api/auth/session");
+          const data = await res.json();
+
+          if (data?.user?.role) {
+            // Session ready — redirect
+            if (data.user.role === "ADMIN") {
+              window.location.replace("/admin");
+            } else {
+              window.location.replace("/dashboard");
+            }
+            return;
+          }
+        } catch (_) {}
+
+        if (attempts < maxAttempts) {
+          setTimeout(pollSession, 500);
+        } else {
+          // Fallback after all retries
+          setLoading(false);
+          setError("Login succeeded but redirect failed. Please refresh the page.");
+        }
+      };
+
+      // Start polling after a short delay
+      setTimeout(pollSession, 300);
+
+    } catch (_) {
+      setLoading(false);
+      setError("Something went wrong. Please try again.");
+    }
+  };
 
   if (status === "loading") {
     return (
@@ -40,46 +99,22 @@ function LoginForm() {
   if (status === "authenticated") {
     return (
       <div className="min-h-screen bg-[#EAEDED] flex items-center justify-center">
-        <div className="flex items-center gap-3 text-[#565959]">
-          <Loader2 className="animate-spin" size={20} />
-          <span>Redirecting...</span>
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="animate-spin text-[#FF9900]" size={28} />
+          <p className="text-sm text-[#565959]">Redirecting to your dashboard...</p>
+          <button
+            onClick={() => {
+              const role = (session?.user as any)?.role;
+              window.location.replace(role === "ADMIN" ? "/admin" : "/dashboard");
+            }}
+            className="text-xs text-[#007185] hover:underline mt-2"
+          >
+            Click here if not redirected automatically
+          </button>
         </div>
       </div>
     );
   }
-
-  const handleLogin = async () => {
-    setError("");
-    if (!email || !password) {
-      setError("Please enter your email and password.");
-      return;
-    }
-    setLoading(true);
-
-    const result = await signIn("credentials", {
-      email: email.toLowerCase().trim(),
-      password,
-      redirect: false,
-    });
-
-    if (result?.error) {
-      setLoading(false);
-      setError("Invalid email or password.");
-      return;
-    }
-
-    // Fetch session to get role, then hard redirect
-    const sessionRes = await fetch("/api/auth/session");
-    const sessionData = await sessionRes.json();
-
-    setLoading(false);
-
-    if (sessionData?.user?.role === "ADMIN") {
-      window.location.href = callbackUrl?.startsWith("/admin") ? callbackUrl : "/admin";
-    } else {
-      window.location.href = callbackUrl?.startsWith("/dashboard") ? callbackUrl : "/dashboard";
-    }
-  };
 
   return (
     <div className="min-h-screen bg-[#EAEDED] flex flex-col">
