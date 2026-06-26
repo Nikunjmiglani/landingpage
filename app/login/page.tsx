@@ -9,16 +9,17 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const registered = searchParams.get("registered");
+  const callbackUrl = searchParams.get("callbackUrl");
   const { data: session, status } = useSession();
-  useEffect(() => {
-  if (status !== "authenticated") return;
 
-  if (session.user.role === "ADMIN") {
-    router.replace("/admin");
-  } else {
-    router.replace("/dashboard");
-  }
-}, [session, status, router]);
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    if (session?.user?.role === "ADMIN") {
+      router.replace(callbackUrl?.startsWith("/admin") ? callbackUrl : "/admin");
+    } else {
+      router.replace(callbackUrl?.startsWith("/dashboard") ? callbackUrl : "/dashboard");
+    }
+  }, [session, status, router, callbackUrl]);
 
   const [showPass, setShowPass] = useState(false);
   const [tab, setTab] = useState<"candidate" | "admin">("candidate");
@@ -27,39 +28,49 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-[#EAEDED] flex items-center justify-center">
+        <Loader2 className="animate-spin text-[#FF9900]" size={28} />
+      </div>
+    );
+  }
+
+  if (status === "authenticated") {
+    return (
+      <div className="min-h-screen bg-[#EAEDED] flex items-center justify-center">
+        <div className="flex items-center gap-3 text-[#565959]">
+          <Loader2 className="animate-spin" size={20} />
+          <span>Redirecting...</span>
+        </div>
+      </div>
+    );
+  }
+
   const handleLogin = async () => {
-  setError("");
+    setError("");
+    if (!email || !password) {
+      setError("Please enter your email and password.");
+      return;
+    }
+    setLoading(true);
 
-  if (!email || !password) {
-    setError("Please enter your email and password.");
-    return;
-  }
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
 
-  setLoading(true);
-
-  const result = await signIn("credentials", {
-    email,
-    password,
-    redirect: false,
-  });
-
-  if (result?.error) {
     setLoading(false);
-    setError("Invalid email or password.");
-    return;
-  }
 
-  const sessionRes = await fetch("/api/auth/session");
-  const sessionData = await sessionRes.json();
+    if (result?.error) {
+      setError("Invalid email or password.");
+      return;
+    }
 
-  setLoading(false);
-
-  if (sessionData?.user?.role === "ADMIN") {
-    router.replace("/admin");
-  } else {
-    router.replace("/dashboard");
-  }
-};
+    // Trigger session refresh — useEffect above handles the redirect
+    router.refresh();
+  };
 
   return (
     <div className="min-h-screen bg-[#EAEDED] flex flex-col">
@@ -72,11 +83,9 @@ function LoginForm() {
 
       <div className="flex-1 flex items-center justify-center px-4 py-10">
         <div className="w-full max-w-sm">
-
           {registered && (
             <div className="flex items-center gap-2 bg-[#E4F5F0] border border-[#067D62] rounded p-3 mb-4 text-sm text-[#067D62]">
-              <CheckCircle size={16} />
-              Account created! Please sign in to continue.
+              <CheckCircle size={16} /> Account created! Please sign in to continue.
             </div>
           )}
 
@@ -101,8 +110,7 @@ function LoginForm() {
 
             {error && (
               <div className="flex items-center gap-2 bg-[#FFF0F0] border border-[#CC0C39] rounded p-3 mb-4 text-sm text-[#CC0C39]">
-                <AlertCircle size={16} className="flex-shrink-0" />
-                {error}
+                <AlertCircle size={16} className="flex-shrink-0" /> {error}
               </div>
             )}
 
@@ -127,7 +135,6 @@ function LoginForm() {
                   </button>
                 </div>
               </div>
-
               <button onClick={handleLogin} disabled={loading}
                 className="w-full bg-[#FFD814] hover:bg-[#F7CA00] text-[#0F1111] font-bold py-2 rounded text-sm border border-[#FCD200] transition-colors disabled:opacity-60 flex items-center justify-center gap-2">
                 {loading ? <><Loader2 size={16} className="animate-spin" /> Signing in...</> : "Sign In"}
@@ -142,12 +149,8 @@ function LoginForm() {
           </div>
 
           <div className="relative my-5">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#DDD]" />
-            </div>
-            <div className="relative flex justify-center text-xs text-[#767676] bg-[#EAEDED] px-3">
-              New to Hirevexa?
-            </div>
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[#DDD]" /></div>
+            <div className="relative flex justify-center text-xs text-[#767676] bg-[#EAEDED] px-3">New to Hirevexa?</div>
           </div>
 
           <Link href="/onboarding"
@@ -156,15 +159,13 @@ function LoginForm() {
           </Link>
 
           <div className="mt-4 text-center">
-            <Link href="#" className="text-[#007185] text-sm hover:underline hover:text-[#C7511F]">
-              Forgot your password?
-            </Link>
+            <Link href="#" className="text-[#007185] text-sm hover:underline hover:text-[#C7511F]">Forgot your password?</Link>
           </div>
         </div>
       </div>
 
       <div className="border-t border-[#DDD] py-4 text-center text-xs text-[#565959]">
-        © 2024 Hirevexa Consultancy ·{" "}
+        © 2025 Hirevexa Consultancy ·{" "}
         <Link href="#" className="hover:underline text-[#007185]">Privacy</Link> ·{" "}
         <Link href="#" className="hover:underline text-[#007185]">Terms</Link>
       </div>
@@ -174,7 +175,11 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#EAEDED] flex items-center justify-center"><div className="text-[#565959]">Loading...</div></div>}>
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#EAEDED] flex items-center justify-center">
+        <Loader2 className="animate-spin text-[#FF9900]" size={28} />
+      </div>
+    }>
       <LoginForm />
     </Suspense>
   );

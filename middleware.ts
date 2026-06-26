@@ -9,7 +9,7 @@ export async function middleware(req: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET,
   });
 
-  // Not logged in
+  // Not logged in — redirect to login
   if (!token) {
     if (pathname.startsWith("/admin") || pathname.startsWith("/dashboard")) {
       const loginUrl = new URL("/login", req.url);
@@ -21,7 +21,7 @@ export async function middleware(req: NextRequest) {
 
   const role = token.role as string;
 
-  // Logged in but not ADMIN trying to access /admin
+  // Non-admin trying to access /admin
   if (pathname.startsWith("/admin") && role !== "ADMIN") {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
@@ -31,9 +31,21 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/admin", req.url));
   }
 
+  // Already logged in trying to access /login — redirect to correct place
+  if (pathname === "/login") {
+    if (role === "ADMIN") {
+      return NextResponse.redirect(new URL("/admin", req.url));
+    }
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/dashboard/:path*"],
+  matcher: [
+    "/admin/:path*",
+    "/dashboard/:path*",
+    "/login",
+  ],
 };
