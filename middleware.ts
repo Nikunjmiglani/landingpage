@@ -9,7 +9,7 @@ export async function middleware(req: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET,
   });
 
-  // Not logged in — redirect to login
+  // Not logged in
   if (!token) {
     if (pathname.startsWith("/admin") || pathname.startsWith("/dashboard")) {
       const loginUrl = new URL("/login", req.url);
@@ -31,7 +31,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/admin", req.url));
   }
 
-  // Already logged in trying to access /login — redirect to correct place
+  // Already logged in trying to visit /login
   if (pathname === "/login") {
     if (role === "ADMIN") {
       return NextResponse.redirect(new URL("/admin", req.url));
@@ -47,5 +47,6 @@ export const config = {
     "/admin/:path*",
     "/dashboard/:path*",
     "/login",
+    // /auth/redirect is intentionally excluded — it handles its own auth
   ],
 };
