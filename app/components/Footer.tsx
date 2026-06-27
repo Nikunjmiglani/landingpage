@@ -69,7 +69,7 @@ export default function Footer() {
                 <li><Link href="/login" className="hover:text-white hover:underline">Sign In</Link></li>
                 <li><Link href="/onboarding" className="hover:text-white hover:underline">Create Account</Link></li>
                 <li>
-                  <a href="mailto:hirevexaconsultancy01@gmail.com" className="hover:text-white hover:underline">
+                  <a href="mailto:hirevexaconsultancy@gmail.com" className="hover:text-white hover:underline">
                     Email Support
                   </a>
                 </li>
@@ -128,11 +128,14 @@ export default function Footer() {
           </div>
 
           <div className="flex flex-wrap justify-center gap-3 text-[#DDDDDD] text-[10px] sm:text-xs">
-            <Link href="/about" className="hover:text-white hover:underline">About</Link>
-            <Link href="/jobs" className="hover:text-white hover:underline">Jobs</Link>
-            <Link href="/courses" className="hover:text-white hover:underline">Courses</Link>
-            <Link href="/login" className="hover:text-white hover:underline">Login</Link>
-          </div>
+  <Link href="/about" className="hover:text-white hover:underline">About</Link>
+  <Link href="/jobs" className="hover:text-white hover:underline">Jobs</Link>
+  <Link href="/courses" className="hover:text-white hover:underline">Courses</Link>
+  <Link href="/login" className="hover:text-white hover:underline">Login</Link>
+  <span className="text-[#37475A]">·</span>
+  <Link href="/privacy-policy" className="hover:text-white hover:underline">Privacy Policy</Link>
+  <Link href="/terms" className="hover:text-white hover:underline">Terms & Conditions</Link>
+</div>
 
           <p className="text-[#AAAAAA] text-[10px] sm:text-xs text-center">
             © 2025 HireVexa Consultancy. All rights reserved.

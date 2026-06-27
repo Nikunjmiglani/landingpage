@@ -170,7 +170,7 @@ function LoginForm() {
           </Link>
 
           <div className="mt-4 text-center">
-            <Link href="#" className="text-[#007185] text-sm hover:underline hover:text-[#C7511F]">
+            <Link href="/forgot-password" className="text-[#007185] text-sm hover:underline hover:text-[#C7511F]">
               Forgot your password?
             </Link>
           </div>

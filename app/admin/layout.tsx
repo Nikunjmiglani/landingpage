@@ -20,7 +20,7 @@ const NAV = [
   { label: "Orders", href: "/admin/orders", icon: ShoppingBag },
   { divider: true, label: "Reports" },
   { label: "Analytics", href: "/admin/analytics", icon: BarChart2 },
-  { label: "Settings", href: "/admin/settings", icon: Settings },
+  
 ];
 
 function SidebarLink({ item, onClick }: { item: any; onClick?: () => void }) {

@@ -47,7 +47,7 @@ const whyUs = [
   { icon: Target, title: "Personalised Matching", desc: "We map your profile to roles that actually fit — no mass applying to irrelevant positions." },
   { icon: Shield, title: "End-to-End Support", desc: "Resume, prep, apply, negotiate — we're with you at every step until you join." },
   { icon: Zap, title: "Fast Turnaround", desc: "Most candidates see interview calls within 2–3 weeks of completing their profile." },
-  { icon: HeartHandshake, title: "No Hidden Charges", desc: "Free registration. No placement fee deducted from your salary. Transparent pricing." },
+  
 ];
 
 function useCountUp(target: number, duration = 1800, decimals = 0) {
@@ -318,7 +318,7 @@ export default function HomePage() {
               We&apos;re not a job board. We&apos;re a placement partner — with real humans who care about your career.
             </p>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid sm:grid-cols-3 gap-5">
             {whyUs.map(item => (
               <div key={item.title} className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition group">
                 <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center mb-4 group-hover:bg-[#FF9900] transition">

@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-
 import {
-  BookOpen, Clock, Users, Star, ChevronDown, ChevronRight,
-  Play, Lock, CheckCircle, ArrowLeft, Globe, BarChart2, Loader2
+  BookOpen, Clock, Users, ChevronDown, ChevronRight,
+  Play, Lock, CheckCircle, ArrowLeft, Globe, BarChart2,
+  Loader2, Calendar, Award, Star, Zap
 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
@@ -23,6 +23,11 @@ interface Course {
 }
 
 const LEVEL_LABELS: Record<string, string> = { BEGINNER: "Beginner", INTERMEDIATE: "Intermediate", ADVANCED: "Advanced" };
+const LEVEL_COLORS: Record<string, string> = {
+  BEGINNER: "bg-green-50 text-green-700",
+  INTERMEDIATE: "bg-yellow-50 text-yellow-700",
+  ADVANCED: "bg-red-50 text-red-700",
+};
 
 export default function CourseDetailPage() {
   const params = useParams();
@@ -41,19 +46,21 @@ export default function CourseDetailPage() {
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then(data => {
         setCourse(data);
-        // Expand first module by default
-        if (data.modules?.[0]) setExpandedModules(new Set([data.modules[0].id]));
+        // Expand first 2 modules by default
+        if (data.modules?.length > 0) {
+          const initial = new Set<string>([data.modules[0].id]);
+          if (data.modules[1]) initial.add(data.modules[1].id);
+          setExpandedModules(initial);
+        }
       })
       .catch(() => router.push("/courses"))
       .finally(() => setLoading(false));
   }, [slug, router]);
 
-  // Check if already enrolled
   useEffect(() => {
     if (!session || !course) return;
     axios.get("/api/enrollments").then(res => {
-      const isEnrolled = res.data.some((e: any) => e.courseId === course.id);
-      setEnrolled(isEnrolled);
+      setEnrolled(res.data.some((e: any) => e.courseId === course.id));
     }).catch(() => {});
   }, [session, course]);
 
@@ -64,83 +71,127 @@ export default function CourseDetailPage() {
       setEnrolling(true);
       await axios.post("/api/enrollments", { courseId: course!.id });
       setEnrolled(true);
-      toast.success("Enrolled successfully! Start learning now.");
+      toast.success("Enrolled! Start learning now.");
     } catch (err: any) {
       toast.error(err?.response?.data?.message ?? "Failed to enroll.");
     } finally { setEnrolling(false); }
   }
 
   function toggleModule(id: string) {
-    setExpandedModules(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+    setExpandedModules(prev => {
+      const n = new Set(prev);
+      n.has(id) ? n.delete(id) : n.add(id);
+      return n;
+    });
   }
 
   const totalLessons = course?.modules.reduce((a, m) => a + m.lessons.length, 0) ?? 0;
   const effectivePrice = course ? course.price - (course.price * course.discount) / 100 : 0;
+  const totalMonths = course?.modules.length ?? 0;
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="flex items-center justify-center h-64"><Loader2 className="animate-spin text-[#FF9900]" size={32} /></div>
+    <div className="min-h-screen flex items-center justify-center">
+      <Loader2 className="animate-spin text-[#FF9900]" size={32} />
     </div>
   );
   if (!course) return null;
 
+  const EnrollButton = ({ full = false }: { full?: boolean }) => (
+    <button onClick={handleEnroll} disabled={enrolling}
+      className={`inline-flex items-center justify-center gap-2 bg-[#FF9900] hover:bg-[#e88d00] text-gray-900 font-bold rounded-xl text-sm transition disabled:opacity-60 ${full ? "w-full py-3.5" : "px-5 py-2.5"}`}>
+      {enrolling ? <><Loader2 size={14} className="animate-spin" /> Enrolling...</>
+        : enrolled ? <><CheckCircle size={14} /> Go to My Course</>
+        : effectivePrice === 0 ? "Enroll Free" : `Enroll — ₹${effectivePrice.toFixed(0)}`}
+    </button>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
-      
-
       {/* Hero */}
-      <div className="bg-gradient-to-br from-[#1a2332] to-[#232F3E] text-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+      <div className="bg-gradient-to-br from-[#1a2332] via-[#232F3E] to-[#2d3f52] text-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
           <Link href="/courses" className="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm mb-6 transition">
             <ArrowLeft size={15} /> Back to Courses
           </Link>
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
             <div className="lg:col-span-2">
               {course.category && (
-                <p className="text-[#FF9900] text-xs font-semibold uppercase tracking-widest mb-3">{course.category.name}</p>
+                <span className="inline-block bg-[#FF9900]/15 border border-[#FF9900]/25 text-[#FF9900] text-xs font-semibold px-3 py-1 rounded-full mb-4 uppercase tracking-wider">
+                  {course.category.name}
+                </span>
               )}
-              <h1 className="text-2xl sm:text-3xl font-bold leading-tight mb-3">{course.title}</h1>
-              <p className="text-gray-300 text-sm leading-relaxed mb-5">{course.shortDescription}</p>
-              <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400 mb-6">
-                <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full"><BarChart2 size={11} /> {LEVEL_LABELS[course.level]}</span>
-                <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full"><Globe size={11} /> {course.language}</span>
-                {course.duration && <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full"><Clock size={11} /> {course.duration}</span>}
-                <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full"><Users size={11} /> {course._count.enrollments} enrolled</span>
-                <span className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded-full"><BookOpen size={11} /> {course.modules.length} modules · {totalLessons} lessons</span>
+              <h1 className="text-2xl sm:text-4xl font-bold leading-tight mb-4">{course.title}</h1>
+              <p className="text-gray-300 text-sm sm:text-base leading-relaxed mb-6">{course.shortDescription}</p>
+
+              <div className="flex flex-wrap gap-2 mb-6">
+                <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ${LEVEL_COLORS[course.level]}`}>
+                  <BarChart2 size={11} /> {LEVEL_LABELS[course.level]}
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-xs bg-white/10 px-3 py-1.5 rounded-full">
+                  <Globe size={11} /> {course.language}
+                </span>
+                {course.duration && (
+                  <span className="inline-flex items-center gap-1.5 text-xs bg-white/10 px-3 py-1.5 rounded-full">
+                    <Clock size={11} /> {course.duration}
+                  </span>
+                )}
+                <span className="inline-flex items-center gap-1.5 text-xs bg-white/10 px-3 py-1.5 rounded-full">
+                  <Users size={11} /> {course._count.enrollments} enrolled
+                </span>
+                {totalMonths > 0 && (
+                  <span className="inline-flex items-center gap-1.5 text-xs bg-white/10 px-3 py-1.5 rounded-full">
+                    <Calendar size={11} /> {totalMonths} month{totalMonths !== 1 ? "s" : ""} · {totalLessons} lessons
+                  </span>
+                )}
               </div>
-              {course.instructor && <p className="text-sm text-gray-400">Instructor: <span className="text-white font-medium">{course.instructor}</span></p>}
+
+              {course.instructor && (
+                <p className="text-sm text-gray-400">
+                  Instructor: <span className="text-white font-semibold">{course.instructor}</span>
+                </p>
+              )}
             </div>
 
-            {/* Enrollment card — visible on desktop in hero, hidden on mobile (shown below) */}
+            {/* Desktop enrollment card */}
             <div className="hidden lg:block">
-              <div className="bg-white rounded-2xl shadow-xl overflow-hidden text-gray-900">
+              <div className="bg-white rounded-2xl shadow-2xl overflow-hidden text-gray-900 sticky top-6">
                 {course.thumbnailUrl ? (
                   <img src={course.thumbnailUrl} alt={course.title} className="w-full h-44 object-cover" />
                 ) : (
-                  <div className="w-full h-44 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                    <BookOpen className="h-12 w-12 text-gray-300" />
+                  <div className="w-full h-44 bg-gradient-to-br from-[#232F3E] to-[#37475A] flex items-center justify-center">
+                    <BookOpen className="h-14 w-14 text-white/20" />
                   </div>
                 )}
                 <div className="p-5">
                   <div className="mb-4">
-                    <span className="text-3xl font-bold">{effectivePrice === 0 ? "Free" : `₹${effectivePrice.toFixed(0)}`}</span>
-                    {course.discount > 0 && (
-                      <div className="flex items-center gap-2 mt-1">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-bold text-gray-900">
+                        {effectivePrice === 0 ? "Free" : `₹${effectivePrice.toFixed(0)}`}
+                      </span>
+                      {course.discount > 0 && (
                         <span className="text-sm text-gray-400 line-through">₹{course.price}</span>
-                        <span className="text-sm font-bold text-emerald-600">{course.discount}% off</span>
-                      </div>
+                      )}
+                    </div>
+                    {course.discount > 0 && (
+                      <span className="text-sm font-bold text-emerald-600">{course.discount}% off</span>
                     )}
                   </div>
-                  <button onClick={handleEnroll} disabled={enrolling}
-                    className="w-full inline-flex items-center justify-center gap-2 bg-[#FF9900] hover:bg-[#e88d00] text-gray-900 font-bold py-3.5 rounded-xl text-sm transition disabled:opacity-60 mb-3">
-                    {enrolling ? <><Loader2 size={15} className="animate-spin" /> Enrolling...</> :
-                      enrolled ? <><CheckCircle size={15} /> Go to Course</> : "Enroll Now"}
-                  </button>
-                  {!session && <p className="text-xs text-center text-gray-400"><Link href="/login" className="text-[#FF9900] font-semibold hover:underline">Login</Link> to enroll</p>}
-                  <div className="mt-4 space-y-2">
-                    {[`${course.modules.length} modules`, `${totalLessons} lessons`, course.language, LEVEL_LABELS[course.level]].map(item => (
-                      <div key={item} className="flex items-center gap-2 text-xs text-gray-600">
-                        <CheckCircle size={13} className="text-emerald-500 flex-shrink-0" /> {item}
+                  <EnrollButton full />
+                  {!session && (
+                    <p className="text-xs text-center text-gray-400 mt-2">
+                      <Link href="/login" className="text-[#FF9900] font-semibold hover:underline">Login</Link> to enroll
+                    </p>
+                  )}
+                  <div className="mt-5 space-y-2.5 border-t border-gray-100 pt-4">
+                    {[
+                      { icon: Calendar, text: `${totalMonths} month${totalMonths !== 1 ? "s" : ""} of content` },
+                      { icon: BookOpen, text: `${totalLessons} lessons` },
+                      { icon: Globe, text: `Taught in ${course.language}` },
+                      { icon: Award, text: LEVEL_LABELS[course.level] },
+                      { icon: Zap, text: "Lifetime access" },
+                    ].map(({ icon: Icon, text }) => (
+                      <div key={text} className="flex items-center gap-2 text-xs text-gray-600">
+                        <Icon size={13} className="text-[#FF9900] flex-shrink-0" /> {text}
                       </div>
                     ))}
                   </div>
@@ -151,65 +202,117 @@ export default function CourseDetailPage() {
         </div>
       </div>
 
-      {/* Mobile enroll card */}
-      <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-gray-200 shadow-sm px-4 py-3 flex items-center justify-between">
-        <div>
-          <span className="text-xl font-bold text-gray-900">{effectivePrice === 0 ? "Free" : `₹${effectivePrice.toFixed(0)}`}</span>
-          {course.discount > 0 && <span className="text-xs text-gray-400 line-through ml-2">₹{course.price}</span>}
+      {/* Mobile sticky enroll bar */}
+      <div className="lg:hidden sticky top-0 z-30 bg-white border-b border-gray-200 shadow-sm px-4 py-3 flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex items-baseline gap-2">
+            <span className="text-lg font-bold text-gray-900">{effectivePrice === 0 ? "Free" : `₹${effectivePrice.toFixed(0)}`}</span>
+            {course.discount > 0 && <span className="text-xs text-gray-400 line-through">₹{course.price}</span>}
+          </div>
+          {course.discount > 0 && <p className="text-xs text-emerald-600 font-semibold">{course.discount}% off</p>}
         </div>
-        <button onClick={handleEnroll} disabled={enrolling}
-          className="inline-flex items-center gap-2 bg-[#FF9900] text-gray-900 font-bold px-5 py-2.5 rounded-xl text-sm transition disabled:opacity-60">
-          {enrolling ? <Loader2 size={14} className="animate-spin" /> : enrolled ? "Go to Course" : "Enroll Now"}
-        </button>
+        <EnrollButton />
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
 
-            {/* Description */}
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+            {/* Quick stats */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { icon: Calendar, label: "Duration", value: `${totalMonths} Months` },
+                { icon: BookOpen, label: "Lessons", value: `${totalLessons}` },
+                { icon: Users, label: "Enrolled", value: `${course._count.enrollments}+` },
+                { icon: Award, label: "Level", value: LEVEL_LABELS[course.level] },
+              ].map(s => (
+                <div key={s.label} className="bg-white border border-gray-200 rounded-xl p-3 sm:p-4 text-center shadow-sm">
+                  <div className="w-8 h-8 rounded-lg bg-orange-50 flex items-center justify-center mx-auto mb-2">
+                    <s.icon size={15} className="text-[#FF9900]" />
+                  </div>
+                  <p className="font-bold text-gray-900 text-sm">{s.value}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{s.label}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* About */}
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 sm:p-6">
               <h2 className="text-lg font-bold text-gray-900 mb-4">About This Course</h2>
               <p className="text-sm text-gray-600 leading-7 whitespace-pre-wrap">{course.description}</p>
             </div>
 
-            {/* Curriculum */}
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-              <div className="flex items-center justify-between mb-5">
-                <h2 className="text-lg font-bold text-gray-900">Curriculum</h2>
-                <span className="text-xs text-gray-500">{course.modules.length} modules · {totalLessons} lessons</span>
+            {/* Month-by-month curriculum */}
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6">
+                <div>
+                  <h2 className="text-lg font-bold text-gray-900">Course Curriculum</h2>
+                  <p className="text-xs text-gray-400 mt-0.5">{totalMonths} months · {totalLessons} lessons</p>
+                </div>
+                <button
+                  onClick={() => {
+                    const allIds = new Set(course.modules.map(m => m.id));
+                    const allOpen = course.modules.every(m => expandedModules.has(m.id));
+                    setExpandedModules(allOpen ? new Set() : allIds);
+                  }}
+                  className="text-xs font-semibold text-[#FF9900] hover:underline self-start sm:self-auto">
+                  {course.modules.every(m => expandedModules.has(m.id)) ? "Collapse all" : "Expand all"}
+                </button>
               </div>
 
               {course.modules.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-8">Curriculum coming soon.</p>
+                <div className="text-center py-10 text-gray-400">
+                  <BookOpen className="h-10 w-10 mx-auto mb-3 text-gray-200" />
+                  <p className="text-sm">Curriculum coming soon.</p>
+                </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {course.modules.map((mod, mi) => {
                     const isOpen = expandedModules.has(mod.id);
+                    const previewCount = mod.lessons.filter(l => l.isPreview).length;
                     return (
                       <div key={mod.id} className="border border-gray-200 rounded-xl overflow-hidden">
                         <button onClick={() => toggleModule(mod.id)}
-                          className="w-full flex items-center justify-between px-4 py-3.5 bg-gray-50 hover:bg-gray-100 transition text-left">
-                          <div className="flex items-center gap-3">
-                            <span className="w-7 h-7 rounded-lg bg-[#232F3E] text-white flex items-center justify-center text-xs font-bold flex-shrink-0">{mi + 1}</span>
-                            <div>
-                              <p className="font-semibold text-sm text-gray-900">{mod.title}</p>
-                              <p className="text-xs text-gray-400 mt-0.5">{mod.lessons.length} lesson{mod.lessons.length !== 1 ? "s" : ""}</p>
+                          className="w-full flex items-center gap-3 px-4 py-4 bg-gray-50 hover:bg-gray-100 transition text-left group">
+                          {/* Month badge */}
+                          <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-[#232F3E] to-[#37475A] text-white flex flex-col items-center justify-center shadow-sm group-hover:from-[#FF9900] group-hover:to-[#e88d00] group-hover:text-gray-900 transition-all">
+                            <span className="text-[10px] font-semibold opacity-70 leading-none">Month</span>
+                            <span className="text-xl font-bold leading-tight">{mi + 1}</span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-bold text-sm text-gray-900 leading-snug">{mod.title}</p>
+                            {mod.description && (
+                              <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{mod.description}</p>
+                            )}
+                            <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-400">
+                              <span>{mod.lessons.length} lesson{mod.lessons.length !== 1 ? "s" : ""}</span>
+                              {previewCount > 0 && <span className="text-[#FF9900] font-semibold">{previewCount} free preview</span>}
                             </div>
                           </div>
-                          {isOpen ? <ChevronDown size={16} className="text-gray-400" /> : <ChevronRight size={16} className="text-gray-400" />}
+                          {isOpen ? <ChevronDown size={16} className="text-gray-400 flex-shrink-0" /> : <ChevronRight size={16} className="text-gray-400 flex-shrink-0" />}
                         </button>
+
                         {isOpen && (
-                          <div className="divide-y divide-gray-100">
+                          <div className="divide-y divide-gray-50">
                             {mod.lessons.map((lesson, li) => (
-                              <div key={lesson.id} className="flex items-center gap-3 px-5 py-3 hover:bg-gray-50">
-                                <span className="text-xs text-gray-400 w-5 flex-shrink-0">{li + 1}.</span>
-                                {lesson.isPreview
-                                  ? <Play size={14} className="text-[#FF9900] flex-shrink-0" />
-                                  : <Lock size={14} className="text-gray-300 flex-shrink-0" />}
-                                <span className={`text-sm flex-1 ${lesson.isPreview ? "text-gray-800" : "text-gray-500"}`}>{lesson.title}</span>
-                                {lesson.isPreview && <span className="text-xs text-[#FF9900] font-semibold bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100">Preview</span>}
-                                {lesson.duration && <span className="text-xs text-gray-400">{lesson.duration}</span>}
+                              <div key={lesson.id} className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition">
+                                <span className="text-xs text-gray-300 w-5 flex-shrink-0 text-right">{li + 1}</span>
+                                <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${lesson.isPreview ? "bg-orange-50" : "bg-gray-100"}`}>
+                                  {lesson.isPreview
+                                    ? <Play size={12} className="text-[#FF9900]" />
+                                    : <Lock size={12} className="text-gray-300" />}
+                                </div>
+                                <span className={`text-sm flex-1 min-w-0 truncate ${lesson.isPreview ? "text-gray-800 font-medium" : "text-gray-500"}`}>
+                                  {lesson.title}
+                                </span>
+                                {lesson.isPreview && (
+                                  <span className="text-[10px] font-bold text-[#FF9900] bg-orange-50 px-2 py-0.5 rounded-full border border-orange-100 flex-shrink-0">
+                                    FREE
+                                  </span>
+                                )}
+                                {lesson.duration && (
+                                  <span className="text-xs text-gray-400 flex-shrink-0">{lesson.duration}</span>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -219,11 +322,33 @@ export default function CourseDetailPage() {
                   })}
                 </div>
               )}
+
+              {/* Enroll CTA inside curriculum */}
+              {!enrolled && (
+                <div className="mt-6 p-4 bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-100 rounded-xl text-center">
+                  <p className="text-sm font-semibold text-gray-900 mb-1">Ready to start learning?</p>
+                  <p className="text-xs text-gray-500 mb-3">Get full access to all {totalMonths} months of content</p>
+                  <EnrollButton full />
+                </div>
+              )}
+            </div>
+
+            {/* What you'll learn */}
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 sm:p-6">
+              <h2 className="text-lg font-bold text-gray-900 mb-4">What You&apos;ll Learn</h2>
+              <div className="grid sm:grid-cols-2 gap-2.5">
+                {course.modules.map((mod, mi) => (
+                  <div key={mod.id} className="flex items-start gap-2.5">
+                    <CheckCircle size={15} className="text-emerald-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-gray-700">Month {mi + 1}: {mod.title}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
           </div>
 
-          {/* Desktop sidebar spacer — card already rendered in hero */}
+          {/* Desktop sidebar spacer */}
           <div className="hidden lg:block" />
         </div>
       </div>
