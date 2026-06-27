@@ -97,14 +97,20 @@ export default function Footer() {
 
           {/* Divider */}
           <div className="border-t border-[#37475A] mt-8 pt-6">
+
             {/* Contact strip */}
-            <div className="flex flex-wrap justify-center gap-3 sm:gap-6 text-[#AAAAAA] text-[10px] sm:text-xs mb-4 text-center">
-              <a href="mailto:hirevexaconsultancy01@gmail.com" className="hover:text-white transition">
-                📧 hirevexaconsultancy01@gmail.com
-              </a>
-              <span>🕐 Mon–Sat, 9am–6pm IST</span>
-              <span>📍 Pan India</span>
-            </div>
+<div className="text-[#AAAAAA] text-[10px] sm:text-xs mb-4 text-center">
+  <div className="flex flex-wrap justify-center gap-3 sm:gap-6 mb-2">
+    <a href="mailto:hirevexaconsultancy01@gmail.com" className="hover:text-white transition">
+      📧 hirevexaconsultancy01@gmail.com
+    </a>
+    <span>🕐 Mon–Sat, 9am–6pm IST</span>
+  </div>
+
+  <p className="max-w-3xl mx-auto px-2">
+    📍 Office No. 214, Durga Tower, Behind Gaur Central Mall, RDC, Block 1, P & T Colony, Raj Nagar, Ghaziabad, Uttar Pradesh 201002
+  </p>
+</div>
 
             {/* Social links */}
             <div className="flex justify-center gap-3 mb-2">
