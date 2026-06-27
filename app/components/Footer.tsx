@@ -4,6 +4,13 @@ import Link from "next/link";
 export default function Footer() {
   return (
     <footer>
+      <style>{`
+        @keyframes waBounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-3px); }
+        }
+      `}</style>
+
       {/* Back to top */}
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
@@ -69,13 +76,18 @@ export default function Footer() {
                 <li><Link href="/login" className="hover:text-white hover:underline">Sign In</Link></li>
                 <li><Link href="/onboarding" className="hover:text-white hover:underline">Create Account</Link></li>
                 <li>
-                  <a href="mailto:hirevexaconsultancy@gmail.com" className="hover:text-white hover:underline">
+                  <a href="mailto:hirevexaconsultancy01@gmail.com" className="hover:text-white hover:underline">
                     Email Support
                   </a>
                 </li>
                 <li>
-                  <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline">
-                    WhatsApp Us
+                  <a
+                    href="https://www.whatsapp.com/channel/0029VbAriUBAYlUBEhYmSX3X"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white hover:underline"
+                  >
+                    WhatsApp Channel
                   </a>
                 </li>
               </ul>
@@ -97,9 +109,10 @@ export default function Footer() {
             {/* Social links */}
             <div className="flex justify-center gap-3 mb-2">
               {[
-                { label: "LinkedIn", href: "https://linkedin.com/company/hirevexa", icon: "in" },
-                { label: "Instagram", href: "https://instagram.com/hirevexa", icon: "ig" },
-                { label: "YouTube", href: "https://youtube.com/@hirevexa", icon: "yt" },
+                { label: "LinkedIn", href: "https://linkedin.com/company/hirevexa", icon: "in", wa: false },
+                { label: "Instagram", href: "https://instagram.com/hirevexa", icon: "ig", wa: false },
+                { label: "YouTube", href: "https://youtube.com/@hirevexa", icon: "yt", wa: false },
+                { label: "WhatsApp", href: "https://www.whatsapp.com/channel/0029VbAriUBAYlUBEhYmSX3X", icon: "wa", wa: true },
               ].map((s) => (
                 <a
                   key={s.label}
@@ -107,9 +120,19 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="w-8 h-8 rounded-full bg-[#37475A] hover:bg-[#FF9900] hover:text-[#131921] text-white flex items-center justify-center text-[10px] font-bold transition-colors"
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold transition-colors text-white ${
+                    s.wa
+                      ? "bg-[#25D366] hover:bg-[#20bc5a]"
+                      : "bg-[#37475A] hover:bg-[#FF9900] hover:text-[#131921]"
+                  }`}
+                  style={s.wa ? { animation: "waBounce 2s ease-in-out infinite" } : {}}
                 >
-                  {s.icon}
+                  {s.wa ? (
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-white">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.535 5.847L.057 23.215a.75.75 0 00.925.926l5.368-1.478A11.955 11.955 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.694-.506-5.23-1.389l-.374-.217-3.876 1.067 1.067-3.876-.217-.374A9.956 9.956 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+                    </svg>
+                  ) : s.icon}
                 </a>
               ))}
             </div>
@@ -128,14 +151,14 @@ export default function Footer() {
           </div>
 
           <div className="flex flex-wrap justify-center gap-3 text-[#DDDDDD] text-[10px] sm:text-xs">
-  <Link href="/about" className="hover:text-white hover:underline">About</Link>
-  <Link href="/jobs" className="hover:text-white hover:underline">Jobs</Link>
-  <Link href="/courses" className="hover:text-white hover:underline">Courses</Link>
-  <Link href="/login" className="hover:text-white hover:underline">Login</Link>
-  <span className="text-[#37475A]">·</span>
-  <Link href="/privacy-policy" className="hover:text-white hover:underline">Privacy Policy</Link>
-  <Link href="/terms" className="hover:text-white hover:underline">Terms & Conditions</Link>
-</div>
+            <Link href="/about" className="hover:text-white hover:underline">About</Link>
+            <Link href="/jobs" className="hover:text-white hover:underline">Jobs</Link>
+            <Link href="/courses" className="hover:text-white hover:underline">Courses</Link>
+            <Link href="/login" className="hover:text-white hover:underline">Login</Link>
+            <span className="text-[#37475A]">·</span>
+            <Link href="/privacy-policy" className="hover:text-white hover:underline">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-white hover:underline">Terms & Conditions</Link>
+          </div>
 
           <p className="text-[#AAAAAA] text-[10px] sm:text-xs text-center">
             © 2025 HireVexa Consultancy. All rights reserved.
