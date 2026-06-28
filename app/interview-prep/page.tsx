@@ -70,7 +70,7 @@ export default function InterviewPrepPage() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/onboarding"
               className="inline-flex items-center justify-center gap-2 bg-[#FF9900] hover:bg-[#e88d00] text-gray-900 font-bold px-8 py-3.5 rounded-xl text-sm transition-all shadow-lg hover:scale-[1.02]">
-              Get Started Free <ArrowRight size={16} />
+              Get Started with ease <ArrowRight size={16} />
             </Link>
             <Link href="/login"
               className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold px-8 py-3.5 rounded-xl text-sm transition-all">
@@ -78,7 +78,7 @@ export default function InterviewPrepPage() {
             </Link>
           </div>
           <div className="mt-8 flex flex-wrap justify-center gap-5 text-xs text-gray-400">
-            {["HR + Technical prep", "One-on-one mock interviews", "Real company patterns", "Free for registered candidates"].map(t => (
+            {["HR + Technical prep", "One-on-one mock interviews", "Real company patterns", "Seamless for registered candidates"].map(t => (
               <span key={t} className="flex items-center gap-1.5">
                 <CheckCircle size={12} className="text-[#FF9900]" /> {t}
               </span>
@@ -186,7 +186,7 @@ export default function InterviewPrepPage() {
             <Zap size={32} className="text-[#FF9900] mx-auto mb-4" />
             <h2 className="text-2xl sm:text-3xl font-bold mb-3">Ready to Ace Your Interview?</h2>
             <p className="text-gray-300 mb-8 max-w-lg mx-auto text-sm">
-              Register free and our counsellors will schedule your personalised prep session within 24 hours.
+              Register now and our counsellors will schedule your personalised prep session within 24 hours.
             </p>
             <Link href="/onboarding"
               className="inline-flex items-center justify-center gap-2 bg-[#FF9900] hover:bg-[#e88d00] text-gray-900 font-bold px-10 py-4 rounded-xl text-sm transition-all shadow-lg hover:scale-[1.02]">
