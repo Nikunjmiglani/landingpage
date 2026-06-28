@@ -176,7 +176,7 @@ export default function HomePage() {
     ? { href: "/admin", label: "Go to Admin Panel" }
     : isCandidate
     ? { href: "/jobs", label: "Browse Open Jobs" }
-    : { href: "/onboarding", label: "Get Started — It's Free" };
+    : { href: "/onboarding", label: "Get Started" };
 
   const secondaryCTA = isAdmin
     ? { href: "/admin/courses", label: "Manage Courses" }
@@ -194,7 +194,7 @@ export default function HomePage() {
     ? { href: "/admin", label: "Admin Dashboard" }
     : isCandidate
     ? { href: "/dashboard", label: "Go to My Dashboard" }
-    : { href: "/onboarding", label: "Create Free Account" };
+    : { href: "/onboarding", label: "Create Account" };
 
   return (
     <div className="min-h-screen bg-white">
@@ -243,7 +243,7 @@ export default function HomePage() {
 
               {!isLoggedIn && (
                 <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 justify-center lg:justify-start text-xs text-gray-400">
-                  {["Free registration", "No placement fees", "Dedicated counsellor"].map(t => (
+                  {["Easy registration", "100% Transparent", "Dedicated counsellor"].map(t => (
                     <span key={t} className="flex items-center gap-1.5">
                       <CheckCircle size={12} className="text-[#FF9900]" /> {t}
                     </span>
@@ -287,7 +287,7 @@ export default function HomePage() {
         <div className="relative border-t border-white/10 bg-black/20 py-3 px-4">
           <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-xs text-gray-300">
             <span>📍 Serving <strong className="text-white">Pan India</strong></span>
-            <span className="hidden sm:inline">📞 <strong className="text-white">Free counselling</strong> sessions available</span>
+            <span className="hidden sm:inline">📞 <strong className="text-white">Best counselling</strong> sessions available</span>
             <span>🤝 <strong className="text-white">45+ hiring partners</strong> onboard</span>
             {isLoggedIn
               ? <Link href={isAdmin ? "/admin" : "/dashboard"} className="text-[#FF9900] hover:underline font-semibold">Go to Dashboard →</Link>
@@ -375,7 +375,7 @@ export default function HomePage() {
           <div className="hidden lg:block absolute top-10 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-transparent via-orange-200 to-transparent" />
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {[
-              { num: "01", title: "Register Free", desc: "Create your profile, tell us your degree, skills, and job preferences.", icon: BookOpen },
+              { num: "01", title: "Register Easy", desc: "Create your profile, tell us your degree, skills, and job preferences.", icon: BookOpen },
               { num: "02", title: "Counselling Call", desc: "A dedicated counsellor reviews your profile and maps you to relevant openings.", icon: Users },
               { num: "03", title: "Prep & Apply", desc: "Resume polish, mock interviews, and direct applications to matched companies.", icon: Shield },
               { num: "04", title: "Get Placed", desc: "Accept your offer. We assist with negotiation and joining formalities too.", icon: Award },
@@ -505,7 +505,7 @@ export default function HomePage() {
                 ? "Manage jobs, candidates, courses and track placements from your admin panel."
                 : isCandidate
                 ? "Check your applications, update your profile, and browse the latest job openings."
-                : "Join hundreds of freshers who trusted HireVexa to land their first role. Free to register. No strings attached."}
+                : "Join hundreds of freshers who trusted HireVexa to land their first role. Easy to register. No strings attached."}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href={bottomPrimaryCTA.href}
@@ -518,7 +518,7 @@ export default function HomePage() {
               </Link>
             </div>
             {!isLoggedIn && (
-              <p className="mt-5 text-gray-500 text-xs">No credit card required · Free registration · Placement support included</p>
+              <p className="mt-5 text-gray-500 text-xs">All payment modes · Easy registration · Placement support included</p>
             )}
           </div>
         </div>
