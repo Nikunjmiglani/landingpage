@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Footer from "../components/Footer";
 
-export const metadata = { title: "Privacy Policy | HireVexa" };
+export const metadata = { title: "Privacy Policy | HireVexa Consultancy" };
 
 const sections = [
   {
@@ -25,19 +25,23 @@ const sections = [
     content: `You have the right to access, update, or delete your personal information at any time by logging into your dashboard or contacting us. You may request a copy of your data or ask us to stop using it for marketing purposes. If you wish to delete your account, please contact our support team.`
   },
   {
-    title: "6. Cookies",
+    title: "6. Payments and GST",
+    content: `HireVexa Consultancy collects fees for placement assistance services. All fees are inclusive of Goods and Services Tax (GST) as applicable under Indian law. A GST invoice will be provided upon request. By making a payment, you acknowledge that GST collected cannot be reversed and will be deducted from any refund processed in accordance with our Refund Policy. For details on refunds, please refer to our Refund Policy page.`
+  },
+  {
+    title: "7. Cookies",
     content: `We use cookies and similar tracking technologies to maintain your session, remember your preferences, and analyse platform usage. You can control cookie settings through your browser. Disabling cookies may affect some features of the platform.`
   },
   {
-    title: "7. Data Retention",
+    title: "8. Data Retention",
     content: `We retain your personal data for as long as your account is active or as needed to provide services. If you delete your account, we will remove your personal data within 30 days, except where retention is required by law.`
   },
   {
-    title: "8. Changes to This Policy",
+    title: "9. Changes to This Policy",
     content: `We may update this Privacy Policy from time to time. We will notify you of significant changes by email or by posting a notice on our platform. Continued use of HireVexa after changes are posted constitutes your acceptance of the updated policy.`
   },
   {
-    title: "9. Contact Us",
+    title: "10. Contact Us",
     content: `If you have any questions about this Privacy Policy or how we handle your data, please contact us at hirevexaconsultancy01@gmail.com or write to us at HireVexa Consultancy, Pan India.`
   },
 ];
@@ -64,14 +68,17 @@ export default function PrivacyPolicyPage() {
           {sections.map(s => (
             <div key={s.title}>
               <h2 className="text-lg font-bold text-gray-900 mb-3">{s.title}</h2>
-              <p className="text-sm text-gray-600 leading-relaxed">{s.content}</p>
+              <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{s.content}</p>
             </div>
           ))}
         </div>
 
         <div className="mt-12 pt-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
           <Link href="/" className="text-sm text-[#FF9900] hover:underline font-semibold">← Back to Home</Link>
-          <Link href="/terms" className="text-sm text-gray-500 hover:text-gray-900">View Terms & Conditions →</Link>
+          <div className="flex gap-4">
+            <Link href="/terms" className="text-sm text-gray-500 hover:text-gray-900">Terms & Conditions</Link>
+            <Link href="/refund-policy" className="text-sm text-gray-500 hover:text-gray-900">Refund Policy</Link>
+          </div>
         </div>
       </div>
       <Footer />
