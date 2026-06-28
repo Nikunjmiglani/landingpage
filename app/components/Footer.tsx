@@ -50,7 +50,7 @@ export default function Footer() {
             <div>
               <h4 className="font-bold text-xs sm:text-sm mb-3 text-white">For Candidates</h4>
               <ul className="space-y-2 text-[#DDDDDD] text-xs sm:text-sm">
-                <li><Link href="/onboarding" className="hover:text-white hover:underline">Register Free</Link></li>
+                <li><Link href="/onboarding" className="hover:text-white hover:underline">Easy Register</Link></li>
                 <li><Link href="/dashboard/resume" className="hover:text-white hover:underline">Upload Resume</Link></li>
                 <li><Link href="/dashboard/profile" className="hover:text-white hover:underline">Edit Profile</Link></li>
                 <li><Link href="/dashboard" className="hover:text-white hover:underline">My Dashboard</Link></li>
@@ -76,7 +76,7 @@ export default function Footer() {
                 <li><Link href="/login" className="hover:text-white hover:underline">Sign In</Link></li>
                 <li><Link href="/onboarding" className="hover:text-white hover:underline">Create Account</Link></li>
                 <li>
-                  <a href="mailto:hirevexaconsultancy01@gmail.com" className="hover:text-white hover:underline">
+                  <a href="mailto:hirevexaconsultancy@gmail.com" className="hover:text-white hover:underline">
                     Email Support
                   </a>
                 </li>
@@ -101,8 +101,8 @@ export default function Footer() {
             {/* Contact strip */}
 <div className="text-[#AAAAAA] text-[10px] sm:text-xs mb-4 text-center">
   <div className="flex flex-wrap justify-center gap-3 sm:gap-6 mb-2">
-    <a href="mailto:hirevexaconsultancy01@gmail.com" className="hover:text-white transition">
-      📧 hirevexaconsultancy01@gmail.com
+    <a href="mailto:hirevexaconsultancy@gmail.com" className="hover:text-white transition">
+      📧 hirevexaconsultancy@gmail.com
     </a>
     <span>🕐 Mon–Sat, 9am–6pm IST</span>
   </div>
@@ -167,7 +167,7 @@ export default function Footer() {
           </div>
 
           <p className="text-[#AAAAAA] text-[10px] sm:text-xs text-center">
-            © 2025 HireVexa Consultancy. All rights reserved.
+            © 2026 HireVexa Consultancy. All rights reserved.
           </p>
         </div>
       </div>
