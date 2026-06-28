@@ -165,6 +165,7 @@ export default function Footer() {
             <span className="text-[#37475A]">·</span>
             <Link href="/privacy-policy" className="hover:text-white hover:underline">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-white hover:underline">Terms & Conditions</Link>
+            <Link href="/refund-policy" className="hover:text-white hover:underline">Refund Policy</Link>
           </div>
 
           <p className="text-[#AAAAAA] text-[10px] sm:text-xs text-center">
