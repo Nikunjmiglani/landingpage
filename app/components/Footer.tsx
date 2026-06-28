@@ -104,7 +104,7 @@ export default function Footer() {
     <a href="mailto:hirevexaconsultancy@gmail.com" className="hover:text-white transition">
       📧 hirevexaconsultancy@gmail.com
     </a>
-    <span>🕐 Mon–Sat, 9am–6pm IST</span>
+    <span>🕐 Mon–Fri, 9am–5pm IST</span>
   </div>
 
   <p className="max-w-3xl mx-auto px-2">
