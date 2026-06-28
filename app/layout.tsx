@@ -7,6 +7,11 @@ import { Toaster } from "sonner";
 export const metadata: Metadata = {
   title: "Hirevexa | Launch Your Career",
   description: "Professional career consultancy and job placement services for freshers",
+  icons: {
+    icon: "/logo.ico",
+    shortcut: "/logo.ico",
+    apple: "/logo.ico",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
