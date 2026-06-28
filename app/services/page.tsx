@@ -148,7 +148,7 @@ export default function ServicesPage() {
             HireVexa offers end-to-end digital services under one roof.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="mailto:hirevexaconsultancy01@gmail.com"
+            <a href="mailto:hirevexaconsultancy@gmail.com"
               className="inline-flex items-center justify-center gap-2 bg-[#FF9900] hover:bg-[#e88d00] text-gray-900 font-bold px-8 py-3.5 rounded-xl text-sm transition-all shadow-lg hover:scale-[1.02]">
               Get a Free Consultation <ArrowRight size={16} />
             </a>
@@ -220,7 +220,7 @@ export default function ServicesPage() {
                       ))}
                     </div>
 
-                    <a href="mailto:hirevexaconsultancy01@gmail.com"
+                    <a href="mailto:hirevexaconsultancy@gmail.com"
                       className="inline-flex items-center gap-2 bg-gray-900 hover:bg-[#FF9900] hover:text-gray-900 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition-all">
                       {service.cta} <ArrowRight size={13} />
                     </a>
@@ -264,7 +264,7 @@ export default function ServicesPage() {
               Get a free consultation with our team. We'll understand your needs and recommend the right services for your goals.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <a href="mailto:hirevexaconsultancy01@gmail.com"
+              <a href="mailto:hirevexaconsultancy@gmail.com"
                 className="inline-flex items-center justify-center gap-2 bg-[#FF9900] hover:bg-[#e88d00] text-gray-900 font-bold px-10 py-4 rounded-xl text-sm transition-all shadow-lg hover:scale-[1.02]">
                 Email Us Now <ArrowRight size={16} />
               </a>
