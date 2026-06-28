@@ -150,7 +150,7 @@ export default function ServicesPage() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href="mailto:hirevexaconsultancy@gmail.com"
               className="inline-flex items-center justify-center gap-2 bg-[#FF9900] hover:bg-[#e88d00] text-gray-900 font-bold px-8 py-3.5 rounded-xl text-sm transition-all shadow-lg hover:scale-[1.02]">
-              Get a Free Consultation <ArrowRight size={16} />
+              Get Consultation <ArrowRight size={16} />
             </a>
             <a href="https://www.whatsapp.com/channel/0029VbAriUBAYlUBEhYmSX3X" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold px-8 py-3.5 rounded-xl text-sm transition-all">
@@ -261,7 +261,7 @@ export default function ServicesPage() {
           <div className="relative">
             <h2 className="text-2xl sm:text-3xl font-bold mb-3">Ready to Grow Your Business?</h2>
             <p className="text-gray-300 mb-8 max-w-lg mx-auto text-sm">
-              Get a free consultation with our team. We'll understand your needs and recommend the right services for your goals.
+              Get consultation with our team. We'll understand your needs and recommend the right services for your goals.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <a href="mailto:hirevexaconsultancy@gmail.com"
@@ -273,7 +273,7 @@ export default function ServicesPage() {
                 WhatsApp Us
               </a>
             </div>
-            <p className="mt-5 text-gray-500 text-xs">Free consultation · No commitment · Response within 24 hours</p>
+            <p className="mt-5 text-gray-500 text-xs">Easy consultation · No commitment · Response within 24 hours</p>
           </div>
         </div>
       </section>

@@ -25,7 +25,7 @@ const features = [
 ];
 
 const steps = [
-  { num: "01", title: "Register Free", desc: "Create your HireVexa account and fill in your profile with your education and experience." },
+  { num: "01", title: "Register with Ease", desc: "Create your HireVexa account and fill in your profile with your education and experience." },
   { num: "02", title: "Counsellor Review", desc: "Your dedicated counsellor reviews your profile and existing resume (if any) within 24 hours." },
   { num: "03", title: "Resume Built", desc: "Our team crafts an ATS-friendly, recruiter-approved resume tailored to your target roles." },
   { num: "04", title: "Review & Finalise", desc: "You review the resume, request changes, and get the final version ready to apply." },
@@ -65,11 +65,11 @@ export default function ResumeBuildingPage() {
                 </Link>
                 <Link href="/onboarding"
                   className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold px-8 py-3.5 rounded-xl text-sm transition-all">
-                  Free Consultation
+                  Get Consultation
                 </Link>
               </div>
               <p className="mt-4 text-xs text-gray-400">
-                ✓ Free for registered candidates &nbsp;✓ Delivered in 48hrs &nbsp;✓ Unlimited revisions
+                ✓ Seamless for registered candidates &nbsp;✓ Delivered in 48hrs &nbsp;✓ Unlimited revisions
               </p>
             </div>
             <div className="flex-shrink-0">
@@ -109,7 +109,7 @@ export default function ResumeBuildingPage() {
         <div className="mt-10 text-center">
           <Link href="/onboarding"
             className="inline-flex items-center gap-2 bg-[#232F3E] hover:bg-[#1a2332] text-white font-bold px-8 py-3.5 rounded-xl text-sm transition shadow-sm">
-            Start Now — It&apos;s Free <ArrowRight size={16} />
+            Start Now — It&apos;s <ArrowRight size={16} />
           </Link>
         </div>
       </section>
@@ -227,7 +227,7 @@ export default function ResumeBuildingPage() {
             <FileText size={32} className="text-[#FF9900] mx-auto mb-4" />
             <h2 className="text-2xl sm:text-3xl font-bold mb-3">Turn Your Resume Into an Interview Magnet</h2>
             <p className="text-gray-300 mb-8 max-w-lg mx-auto text-sm">
-              Register free and your counsellor will reach out within 24 hours to start building your resume.
+              Register now and your counsellor will reach out within 24 hours to start building your resume.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/onboarding"
@@ -239,7 +239,7 @@ export default function ResumeBuildingPage() {
                 Upload Existing Resume
               </Link>
             </div>
-            <p className="mt-4 text-gray-500 text-xs">Free for all registered candidates · No hidden charges</p>
+            <p className="mt-4 text-gray-500 text-xs">Seamless for all registered candidates · No hidden charges</p>
           </div>
         </div>
       </section>

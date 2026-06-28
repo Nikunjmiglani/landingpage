@@ -71,11 +71,11 @@ export default function SkillCoursesPage() {
             </Link>
             <Link href="/onboarding"
               className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold px-8 py-3.5 rounded-xl text-sm transition-all">
-              Register Free
+              Register Now
             </Link>
           </div>
           <div className="mt-8 flex flex-wrap justify-center gap-5 text-xs text-gray-400">
-            {["Self-paced learning", "Industry-relevant curriculum", "Certificate on completion", "Free enrollment available"].map(t => (
+            {["Self-paced learning", "Industry-relevant curriculum", "Certificate on completion", "Easy enrollment available"].map(t => (
               <span key={t} className="flex items-center gap-1.5">
                 <CheckCircle size={12} className="text-[#FF9900]" /> {t}
               </span>
@@ -131,7 +131,7 @@ export default function SkillCoursesPage() {
               </p>
               <Link href="/onboarding"
                 className="mt-5 inline-flex items-center gap-2 bg-[#FF9900] text-gray-900 font-bold text-sm px-6 py-3 rounded-xl hover:bg-[#e88d00] transition">
-                Register Free <ArrowRight size={14} />
+                Register Now <ArrowRight size={14} />
               </Link>
             </div>
           ) : (
