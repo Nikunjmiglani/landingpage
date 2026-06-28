@@ -209,21 +209,28 @@ export default function CourseTable({
           const course = row.original;
           return (
             <div className="flex items-center justify-end gap-1">
-              <button
-                onClick={() => onEdit(course)}
-                className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
-                title="Edit"
-              >
-                <Pencil className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => onDelete(course)}
-                className="rounded-lg p-1.5 text-gray-400 transition hover:bg-red-50 hover:text-red-600"
-                title="Delete"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </div>
+  
+   <a href={`/admin/courses/${course.id}/curriculum`}
+    className="rounded-lg p-1.5 text-gray-400 transition hover:bg-orange-50 hover:text-[#FF9900]"
+    title="Curriculum"
+  >
+    <BookOpen className="h-4 w-4" />
+  </a>
+  <button
+    onClick={() => onEdit(course)}
+    className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700"
+    title="Edit"
+  >
+    <Pencil className="h-4 w-4" />
+  </button>
+  <button
+    onClick={() => onDelete(course)}
+    className="rounded-lg p-1.5 text-gray-400 transition hover:bg-red-50 hover:text-red-600"
+    title="Delete"
+  >
+    <Trash2 className="h-4 w-4" />
+  </button>
+</div>
           );
         },
         enableSorting: false,
